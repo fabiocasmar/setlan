@@ -1,7 +1,7 @@
 ####
-#CI3725 - Etapa 1 - Analisis Lexicografico
-#Fabio, Castro, 10-10132
-#Antonio, Scaramazza 11-10957
+#CI3725 - Entrega 1 Grupo 7.
+#Alberto Cols, 09-10177
+#Matteo Ferrando, 09-10285
 ####
 
 #!/usr/bin/env python
@@ -11,39 +11,43 @@ import ply.lex as lex
 # Reserverd words of the language
 reserved = {
     # Language
-    'program' : 'PROGRAM'
+    'program' : 'PROGRAM',
+    'begin' : 'BEGIN',
+    'end' : 'END',
 
     # Types
     'int' : 'INT',
     'bool' : 'BOOL',
-    'set' : 'SET',
+    'range' : 'RANGE',
 
     ## Values
     'true' : 'TRUE',
     'false' : 'FALSE',
 
     # Instructions
-    'using' : 'USING',
-    'in' : 'IN',
+    'declare' : 'DECLARE',
+    'as' : 'AS',
 
     ## Conditionals
     'if' : 'IF',
     'then' : 'THEN',
     'else' : 'ELSE',
 
+    'case' : 'CASE',
+    'of' : 'OF',
+
     ## Loops
-    'repeat' : 'REPEAT',
+    'do' : 'DO',
     'while' : 'WHILE',
 
-    'do': 'DO',
-
     'for' : 'FOR',
+    'in' : 'IN',
 
     ## In/Out
-    'scan' : 'SCAN',
+    'read' : 'READ',
 
-    'print' : 'PRINT',
-    'println' : 'PRINTLN',
+    'write' : 'WRITE',
+    'writeln' : 'WRITELN',
 
     # Expressions/Operators
     'or' : 'OR',
@@ -51,8 +55,10 @@ reserved = {
     'not' : 'NOT',
 
     ## Functions
-    'def' : 'DEF',
-    'return': 'RETURN'
+    'rtoi' : 'RTOI',
+    'length' : 'LENGTH',
+    'top' : 'TOP',
+    'bottom' : 'BOTTOM'
 }
 
 # Tokens to be recognized
@@ -60,8 +66,8 @@ tokens = [
     # Language
     'NUMBER',
     'COMMA',
+    'ASSIGN',
     'SEMICOLON',
-    'ASSIGN'
 
     # Identifiers
     'ID',
@@ -70,38 +76,24 @@ tokens = [
     'ARROW',
     'STRING',
 
+
     # Expressions/Operators
-        # Set Operators
-            'SETPLUS',
-            'SETMINUS',
-            'SETTIMES',
-            'SETMOD',
-            'SETDIVITION',
-            'SETMAX',
-            'SETMIN',
-            'SETLEN',
-            'SETBELONG',   
-            'INTERSECTION',
-            'UNION',
-            'DIFFERENCE',
-        # Int Operators
-            'PLUS',
-            'MINUS',
-            'TIMES',
-            'DIVIDE',
-            'MODULE',
-        #  Bool Operators
-            'LESS',
-            'LESSEQ',
-            'GREAT',
-            'GREATEQ',
-            'EQUAL',
-            'UNEQUAL',
-        #  Bracket
-           'LPAREN',
-           'RPAREN',
-           'OPENCURLY',
-           'CLOSECURLY'
+    'PLUS',
+    'MINUS',
+    'TIMES',
+    'DIVIDE',
+    'MODULE',
+    'LPAREN',
+    'RPAREN',
+    'FROMTO',
+    'INTERSECTION',
+    'LESS',
+    'LESSEQ',
+    'GREAT',
+    'GREATEQ',
+    'EQUAL',
+    'UNEQUAL',
+    'BELONG'
 ] + list(reserved.values())
 
 # Returns the actual value in Python's int type
@@ -145,13 +137,19 @@ t_DIVIDE = r'/'
 t_MODULE = r'%'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
+t_FROMTO = r'\.\.'
+t_INTERSECTION = r'<>'
+t_LESS = r'<'
+t_LESSEQ = r'<='
+t_GREAT = r'>'
+t_GREATEQ = r'>='
 t_EQUAL = r'=='
 t_UNEQUAL = r'/='
 t_BELONG = r'>>'
 
 # Ignores spaces, tabs and (C style) comments
 t_ignore = " \t"
-t_ignore_COMMENT = r'\#.*'
+t_ignore_COMMENT = r'//.*'
 
 # The only new line character considered is '\n'
 def t_newline(t):
