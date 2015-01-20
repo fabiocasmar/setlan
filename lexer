@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 ####
-#CI3725 - Etapa 1 - Analisis Lexicografico
+#CI3725 - Etapa 1 - Análisis Lexicográfico
 #Fabio, Castro, 10-10132
 #Antonio, Scaramazza 11-10957
 ####
@@ -196,7 +196,7 @@ def find_column(text,token):
 
 # Error to be shown if the lexer finds an "Unexpected" character in the program
 def t_error(t):
-    errors_list.append("ERROR: Unexpected character '%s' at line %d, column %d"
+    errors_list.append("Error: Se encontró un caracter inesperado '%s' en la línea %d, columna %d"
                        % (t.value[0], t.lineno, find_column(lexer.lexdata, t)))
     t.lexer.skip(1)
 
@@ -238,10 +238,10 @@ def main(argv = None):
 
     if len(argv) == 1:
         print "ERROR: No input file"
-        sys.exit() ## return (averiguar cuál es mejor)
+        sys.exit(1) ## return (averiguar cuál es mejor)
     elif len(argv) > 2:
         print "ERROR: Invalid number of arguments"
-        sys.exit() ## return (averiguar cuál es mejor)
+        sys.exit(1) ## return (averiguar cuál es mejor)
 
     # Opens file to interpret
     file = open(argv[1], 'r')
@@ -257,6 +257,7 @@ def main(argv = None):
             print ': ' + tok.value,
         print '(Línea ' + str(tok.lineno) + ',',
         print 'Columna ' + str(find_column(lexer.lexdata, tok)) + ')'
+    sys.exit(0)
 
 # If this is the module running
 if __name__ == "__main__":
