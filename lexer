@@ -1,120 +1,120 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 ####
 #CI3725 - Etapa 1 - Analisis Lexicografico
 #Fabio, Castro, 10-10132
 #Antonio, Scaramazza 11-10957
 ####
 
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import ply.lex as lex
 
 # Reserverd words of the language
 reserved = {
-    # Language
-    'program' : 'PROGRAM',
+    # language
+    'program' : 'Program',
 
-    # Types
-    'int' : 'INT',
-    'bool' : 'BOOL',
-    'set' : 'SET',
+    # types
+    'int' : 'Int',
+    'bool' : 'Bool',
+    'set' : 'Set',
 
-    ## Values
-    'true' : 'TRUE',
-    'false' : 'FALSE',
+    ## values
+    'true' : 'True',
+    'false' : 'False',
 
-    # Instructions
-    'using' : 'USING',
-    'in' : 'IN',
+    # instructions
+    'using' : 'Using',
+    'in' : 'In',
 
-    ## Conditionals
-    'if' : 'IF',
-    'then' : 'THEN',
-    'else' : 'ELSE',
+    ## conditionals
+    'if' : 'If',
+    'then' : 'Then',
+    'else' : 'Else',
 
-    ## Loops
-    'repeat' : 'REPEAT',
-    'while' : 'WHILE',
+    ## loops
+    'repeat' : 'Repeat',
+    'while' : 'While',
 
-    'do': 'DO',
+    'do': 'Do',
 
-    'for' : 'FOR',
+    'for' : 'For',
 
-    ## In/Out
-    'scan' : 'SCAN',
+    ## in/out
+    'scan' : 'Scan',
 
-    'print' : 'PRINT',
-    'println' : 'PRINTLN',
+    'print' : 'Print',
+    'println' : 'PrintLn',
 
-    # Expressions/Operators
-    'or' : 'OR',
-    'and' : 'AND',
-    'not' : 'NOT',
+    # expressions/operators
+    'or' : 'Or',
+    'and' : 'And',
+    'not' : 'Not',
 
-    ## Functions
-    'def' : 'DEF',
-    'return': 'RETURN'
+    ## functions
+    'def' : 'Def',
+    'return': 'Return'
 }
 
 # Tokens to be recognized
 tokens = [
     # Language
-    'NUMBER',
-    'COMMA',
-    'SEMICOLON',
-    'ASSIGN'
+    'Number',
+    'Comma',
+    'SemiColon',
+    'Assign',
 
     # Identifiers
     'ID',
 
     # Instructions
-    'ARROW',
-    'STRING',
+    'Arrow',
+    'String',
 
     # Expressions/Operators
         # Set Operators
-            'SETPLUS',
-            'SETMINUS',
-            'SETTIMES',
-            'SETMOD',
-            'SETDIVITION',
-            'SETMAX',
-            'SETMIN',
-            'SETLEN',
-            'SETINTERSECTION',
-            'SETUNION',
-            'SETDIFFERENCE',
+            'SetPlus',
+            'SetMinus',
+            'SetTimes',
+            'SetMod',
+            'SetDivition',
+            'SetMax',
+            'SetMin',
+            'SetLen',
+            'SetIntersection',
+            'SetUnion',
+            'SetDifference',
         # Int Operators
-            'PLUS',
-            'MINUS',
-            'TIMES',
-            'DIVIDE',
-            'MODULE',
+            'Plus',
+            'Minus',
+            'Times',
+            'Divide',
+            'Module',
         #  Bool Operators
-            'LESS',
-            'LESSEQ',
-            'GREAT',
-            'GREATEQ',
-            'EQUAL',
-            'UNEQUAL',
-            # Set-Bool Operators
-                'SETBELONG',   
-        #  Bracket
-           'LPAREN',
-           'RPAREN',
-           'OPENCURLY',
-           'CLOSECURLY'
+            'Less',
+            'LessEq',
+            'Great',
+            'GreatEq',
+            'Equal',
+            'UnEqual',
+            # set-bool operators
+                'SetBelong',   
+        #  bracket
+           'OpenParen',
+           'CloseParen',
+           'OpenCurly',
+           'CloseCurly'
 ] + list(reserved.values())
 
 # Returns the actual value in Python's int type
-def t_NUMBER(t):
+def t_Number(t):
     r'\d+'
     t.value = int(t.value)
     return t
 
-t_COMMA = r','
-t_SEMICOLON = r';'
-t_ASSIGN = r'='
+t_Comma = r','
+t_SemiColon = r';'
+t_Assign = r'='
 
 def t_ID(t):
     r'\w[\w\d]*'
@@ -122,7 +122,7 @@ def t_ID(t):
     t.type = reserved.get(t.value, 'ID')
     return t
 
-t_ARROW = r'->'
+t_Arrow = r'->'
 # These Strings take input even after new lines, it ends only and only in ' " '
 # t_STRING = r'"[^"]*"'
 
@@ -138,44 +138,44 @@ t_ARROW = r'->'
 #   ['writeln', '"number ", N, " is even"']
 # being the latter one a String
 ##########
-t_STRING = r'".*?"'
+t_String = r'".*?"'
 
-# Set Token
-t_SETPLUS = r'\<\+\>'
-t_SETMINUS = r'\<\-\>'
-t_SETTIMES = r'\<\*\>'
-t_SETDIVITION = r'\<\/\>'
-t_SETMOD = r'\<\%\>'
-t_SETMAX = r'\>\?'
-t_SETMIN = r'\<\?'
-t_SETLEN = r'\$\?'
-t_SETINTERSECTION = r'\>\<'
-t_SETUNION = r'\+\+'
-t_SETDIFFERENCE = r'\\'
+# set token
+t_SetPlus = r'\<\+\>'
+t_SetMinus = r'\<\-\>'
+t_SetTimes = r'\<\*\>'
+t_SetDivition = r'\<\/\>'
+t_SetMod = r'\<\%\>'
+t_SetMax = r'\>\?'
+t_SetMin = r'\<\?'
+t_SetLen = r'\$\?'
+t_SetIntersection = r'\>\<'
+t_SetUnion = r'\+\+'
+t_SetDifference = r'\\'
 
-# Int Token
-t_PLUS = r'\+'
-t_MINUS = r'-'
-t_TIMES = r'\*'
-t_DIVIDE = r'/'
-t_MODULE = r'%'
+# int token
+t_Plus = r'\+'
+t_Minus = r'-'
+t_Times = r'\*'
+t_Divide = r'/'
+t_Module = r'%'
 
-# Bool Token
-t_LESS = r'\<'
-t_LESSEQ = r'\<\='
-t_GREAT = r'\>'
-t_GREATEQ = r'\>\='
-t_EQUAL = r'\=\='
-t_UNEQUAL = r'\/\='
+# bool token
+t_Less = r'\<'
+t_LessEq = r'\<\='
+t_Great = r'\>'
+t_GreatEq = r'\>\='
+t_Equal = r'\=\='
+t_UnEqual = r'\/\='
 
-#Set-Bool Token
-t_SETBELONG = r'\@'
+#set-bool token
+t_SetBelong = r'\@'
 
-# Brackets
-t_LPAREN = r'\('
-t_RPAREN = r'\)'
-t_OPENCURLY = r'\{'
-t_CLOSECURLY = r'\}'
+# brackets
+t_OpenParen = r'\('
+t_CloseParen = r'\)'
+t_OpenCurly = r'\{'
+t_CloseCurly = r'\}'
 
 # Ignores spaces, tabs and (C style) comments
 t_ignore = " \t"
@@ -250,10 +250,13 @@ def main(argv = None):
     tokens_list = lexing(file.read())
 
     for tok in tokens_list:
-        print 'tok(' + str(tok.type) + ')',
-        print 'val(' + str(tok.value) + ')',
-        print 'at line ' + str(tok.lineno) + ',',
-        print 'column ' + str(find_column(lexer.lexdata, tok))
+        print 'Token' + str(tok.type),
+        if str(tok.type) == 'ID':
+            print ': "' + tok.value + '"',
+        elif str(tok.type) == 'String':
+            print ': ' + tok.value,
+        print '(Línea ' + str(tok.lineno) + ',',
+        print 'Columna ' + str(find_column(lexer.lexdata, tok)) + ')'
 
 # If this is the module running
 if __name__ == "__main__":
