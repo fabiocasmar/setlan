@@ -123,22 +123,11 @@ def t_ID(t):
     return t
 
 t_Arrow = r'->'
+
 # Los Strings almacenan toda entrada sin importar los saltos de linea
 # Siempre que estas esten entre " "
-# t_STRING = r'"[^"]*"'
 
-# Si se encuentra una nueva linea, se reporta un error.
-##########
-# The ? in the regular expression indicates non-greedy matching,
-# for cases like:
-#   writeln "number ", N, " is even"
-# where it should recognize 6 separate tokens:
-#   ['writeln', '"number "', ',', 'N', ',', '" is even"']
-# not 2 tokens:
-#   ['writeln', '"number ", N, " is even"']
-# being the latter one a String
-##########
-t_String = r'".*?"'
+t_String = r'".*"'
 
 # token de conjuntos
 t_SetPlus = r'\<\+\>'
