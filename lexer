@@ -29,7 +29,6 @@ reserved = {
 
     ## condicionales
     'if' : 'If',
-    'then' : 'Then',
     'else' : 'Else',
 
     ## lazos
