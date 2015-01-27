@@ -9,30 +9,29 @@
 
 import ply.lex as lex
 
-# Reserverd words of the language
+# Palabras reservadas del lenguaje
 reserved = {
-    # language
+    # lenguaje
     'program' : 'Program',
 
-    # types
+    # tipos
     'int' : 'Int',
     'bool' : 'Bool',
     'set' : 'Set',
 
-    ## values
+    ## valores
     'true' : 'True',
     'false' : 'False',
 
-    # instructions
+    # instrucciones
     'using' : 'Using',
     'in' : 'In',
 
-    ## conditionals
+    ## condicionales
     'if' : 'If',
-    'then' : 'Then',
     'else' : 'Else',
 
-    ## loops
+    ## lazos
     'repeat' : 'Repeat',
     'while' : 'While',
 
@@ -40,39 +39,39 @@ reserved = {
 
     'for' : 'For',
 
-    ## in/out
+    ## entrada/salida
     'scan' : 'Scan',
 
     'print' : 'Print',
     'println' : 'PrintLn',
 
-    # expressions/operators
+    # expresiones/operadores
     'or' : 'Or',
     'and' : 'And',
     'not' : 'Not',
 
-    ## functions
+    ## funciones
     'def' : 'Def',
     'return': 'Return'
 }
 
-# Tokens to be recognized
+# Tokens a ser reconocidos
 tokens = [
-    # Language
+    # Lenguaje
     'Number',
     'Comma',
     'SemiColon',
     'Assign',
 
-    # Identifiers
+    # Identificadores
     'ID',
 
-    # Instructions
+    # Instrucciones
     'Arrow',
     'String',
 
-    # Expressions/Operators
-        # Set Operators
+    # Expresiones/Operadores
+        # Operadores de Conjuntos
             'SetPlus',
             'SetMinus',
             'SetTimes',
@@ -84,29 +83,29 @@ tokens = [
             'SetIntersection',
             'SetUnion',
             'SetDifference',
-        # Int Operators
+        # Operadores de Enteros
             'Plus',
             'Minus',
             'Times',
             'Divide',
             'Module',
-        #  Bool Operators
+        #  Operadores Booleanos
             'Less',
             'LessEq',
             'Great',
             'GreatEq',
             'Equal',
             'UnEqual',
-            # set-bool operators
+            # Operadores Booleanos sobre Conjuntos
                 'SetBelong',   
-        #  bracket
+        #  Parentizacion
            'OpenParen',
            'CloseParen',
            'OpenCurly',
            'CloseCurly'
 ] + list(reserved.values())
 
-# Returns the actual value in Python's int type
+# Devuelve el valor almacenado en el tipo entero de Python
 def t_Number(t):
     r'\d+'
     t.value = int(t.value)
@@ -118,29 +117,18 @@ t_Assign = r'='
 
 def t_ID(t):
     r'\w[\w\d]*'
-    # If there are no reserved words that match, it's an ID
+    # Si no existen palabras reservadas que concuender, entonces es un Identificador
     t.type = reserved.get(t.value, 'ID')
     return t
 
 t_Arrow = r'->'
-# These Strings take input even after new lines, it ends only and only in ' " '
-# t_STRING = r'"[^"]*"'
 
-# These Strings take input until a " is found (in the same line),
-# if there's a new line it reports an error.
-##########
-# The ? in the regular expression indicates non-greedy matching,
-# for cases like:
-#   writeln "number ", N, " is even"
-# where it should recognize 6 separate tokens:
-#   ['writeln', '"number "', ',', 'N', ',', '" is even"']
-# not 2 tokens:
-#   ['writeln', '"number ", N, " is even"']
-# being the latter one a String
-##########
-t_String = r'".*?"'
+# Los Strings almacenan toda entrada sin importar los saltos de linea
+# Siempre que estas esten entre " "
 
-# set token
+t_String = r'".*"'
+
+# token de conjuntos
 t_SetPlus = r'\<\+\>'
 t_SetMinus = r'\<\-\>'
 t_SetTimes = r'\<\*\>'
@@ -153,14 +141,14 @@ t_SetIntersection = r'\>\<'
 t_SetUnion = r'\+\+'
 t_SetDifference = r'\\'
 
-# int token
+# token de entero
 t_Plus = r'\+'
 t_Minus = r'-'
 t_Times = r'\*'
 t_Divide = r'/'
 t_Module = r'%'
 
-# bool token
+# token de booleano
 t_Less = r'\<'
 t_LessEq = r'\<\='
 t_Great = r'\>'
@@ -168,25 +156,25 @@ t_GreatEq = r'\>\='
 t_Equal = r'\=\='
 t_UnEqual = r'\/\='
 
-#set-bool token
+#token de booleano sobre entero
 t_SetBelong = r'\@'
 
-# brackets
+# parentizacion
 t_OpenParen = r'\('
 t_CloseParen = r'\)'
 t_OpenCurly = r'\{'
 t_CloseCurly = r'\}'
 
-# Ignores spaces, tabs and (C style) comments
+# Ignora espacion, tabuladores y comentarios en formato C
 t_ignore = " \t"
 t_ignore_COMMENT = r'\#.*'
 
-# The only new line character considered is '\n'
+# El unico caracter de salto de linea a conciderar es "\n"
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count('\n')
 
-# To find the column number of the current line
+# Determinar el numero de columna en la linea actual
 def find_column(text,token):
     last_cr = text.rfind('\n',0,token.lexpos)
     if last_cr < 0:
@@ -194,14 +182,13 @@ def find_column(text,token):
     column = token.lexpos - last_cr
     return column
 
-# Error to be shown if the lexer finds an "Unexpected" character in the program
+# Error a mostrar en caso de encontrar un caracter inseperado
 def t_error(t):
     errors_list.append("Error: Se encontró un caracter inesperado '%s' en la línea %d, columna %d"
                        % (t.value[0], t.lineno, find_column(lexer.lexdata, t)))
     t.lexer.skip(1)
 
-# The file (represented in a Python String)
-# goes through the lexer and returns the list of tokens
+# El archivo es analisado por el lexer, y devuelto en una lista de tokens
 def lexing(file):
 
     global errors_list, lexer
@@ -212,24 +199,24 @@ def lexing(file):
 
     lexer.input(file)
 
-    # Pass entire file through lexer
+    # Analizar el archivo entero mediante el lexer
     for tok in lexer:
         tokens_list.append(tok)
 
-    # If no "Unexpected character" was found
+    # Si no se encuentran caracteres inesperados
     if not errors_list:
         return tokens_list
     else:
-        # Print all the "Unexpected character" errors
+        # Imprimir cada caracter inesperado
         for error in errors_list:
             print error
 
-        # Empty list to indicate error
+        # Lista vacia para indicar error
         return []
 
 ###############################################################################
 
-# Only to be called if this is the main module (not imported in another one)
+# Solo a ser llamado si se utiliza como modulo principal.
 def main(argv = None):
     import sys    # argv, exit
 
@@ -243,10 +230,10 @@ def main(argv = None):
         print "ERROR: Invalid number of arguments"
         sys.exit(1) ## return (averiguar cuál es mejor)
 
-    # Opens file to interpret
+    # Abrir el decriptor de archivos
     file = open(argv[1], 'r')
 
-    # Reads the file and passes it to the Lexer
+    # Leer el archivo y pasarlo al lexer
     tokens_list = lexing(file.read())
 
     for tok in tokens_list:
@@ -259,6 +246,6 @@ def main(argv = None):
         print 'Columna ' + str(find_column(lexer.lexdata, tok)) + ')'
     sys.exit(0)
 
-# If this is the module running
+# Si se ejecuta el modulo.
 if __name__ == "__main__":
     main()
