@@ -108,7 +108,10 @@ tokens = [
 # Devuelve el valor almacenado en el tipo entero de Python
 def t_Number(t):
     r'\d+'
-    t.value = int(t.value)
+    val = int(t.value)
+    if val > 2147483648:
+        error_NUMBER(t)
+    t.value = val
     return t
 
 t_Comma = r','
@@ -126,7 +129,7 @@ t_Arrow = r'->'
 # Los Strings almacenan toda entrada sin importar los saltos de linea
 # Siempre que estas esten entre " "
 
-t_String = r'".*"'
+t_STRING = r'\"([^\\\n]|(\\(n|"|\\)))*?\"'
 
 # token de conjuntos
 t_SetPlus = r'\<\+\>'
@@ -183,69 +186,92 @@ def find_column(text,token):
     return column
 
 # Error a mostrar en caso de encontrar un caracter inseperado
-def t_error(t):
-    errors_list.append("Error: Se encontró un caracter inesperado '%s' en la línea %d, columna %d"
-                       % (t.value[0], t.lineno, find_column(lexer.lexdata, t)))
-    t.lexer.skip(1)
+def t_error(token):
+    text = token.lexer.lexdata
+    message = "Error: Se encontró un caracter inesperado '%s' en la línea %d, columna %d"    r'\d+'
+    val = int(token.value)
+    if val > 2147483648:
+        error_NUMBER(token)
 
-# El archivo es analisado por el lexer, y devuelto en una lista de tokens
-def lexing(file):
+    token.value = val
+    return token
+    data = (token.value[0], token.lineno, find_column(text, token))
+    lexer_error.append(message % data)
+    token.lexer.skip(1)
 
-    global errors_list, lexer
 
-    lexer = lex.lex()
-    tokens_list = []
-    errors_list = []
+# Error a mostrar número, número muy grande
+def error_NUMBER(token):
+    text = token.lexer.lexdata
+    message = "Error: Overflow for int '%s' at line %d, column %d"
+    data = (token.value, token.lineno, find_column(text, token))
+    lexer_error.append(message % data)
 
-    lexer.input(file)
 
-    # Analizar el archivo entero mediante el lexer
-    for tok in lexer:
-        tokens_list.append(tok)
-
-    # Si no se encuentran caracteres inesperados
-    if not errors_list:
-        return tokens_list
-    else:
-        # Imprimir cada caracter inesperado
-        for error in errors_list:
-            print error
-
-        # Lista vacia para indicar error
-        return []
+# Build the lexer
+lex.lex()
+lexer_error = []
 
 ###############################################################################
 
-# Solo a ser llamado si se utiliza como modulo principal.
-def main(argv = None):
-    import sys    # argv, exit
+
+# The file (stored in a Python String)
+# goes through the lexer and returns the list of tokens
+def lexing(file_string, debug=0):
+
+    lexer = lex.lex()
+    tokens_list = []
+
+    lexer.input(file_string, debug=debug)
+
+    # Pass entire file through lexer
+    for tok in lexer:
+        tokens_list.append(tok)
+
+    # If no "Unexpected character" or "Overflow" was found
+    if not lexer_error:
+        return tokens_list
+    else:
+        # Print all the errors
+        for error in lexer_error:
+            print error
+
+        # Empty list to indicate error
+        return []
+
+
+# Only to be called if this is the main module
+def main(argv=None):
+    import sys      # argv, exit
 
     if argv is None:
         argv = sys.argv
 
     if len(argv) == 1:
         print "ERROR: No input file"
-        sys.exit(1) ## return (averiguar cuál es mejor)
-    elif len(argv) > 2:
+        return
+    elif len(argv) > 3:
         print "ERROR: Invalid number of arguments"
-        sys.exit(1) ## return (averiguar cuál es mejor)
+        return
 
-    # Abrir el decriptor de archivos
-    file = open(argv[1], 'r')
+    if len(argv) == 3:
+        debug = argv[2]
+    else:
+        debug = 0
 
-    # Leer el archivo y pasarlo al lexer
-    tokens_list = lexing(file.read())
+    # Opens file to interpret
+    file_string = open(argv[1], 'r').read()
+
+    # Reads the file and passes it to the Lexer
+    tokens_list = lexing(file_string, debug)
 
     for tok in tokens_list:
-        print 'Token' + str(tok.type),
-        if str(tok.type) == 'ID':
-            print ': "' + tok.value + '"',
-        elif str(tok.type) == 'String':
-            print ': ' + tok.value,
-        print '(Línea ' + str(tok.lineno) + ',',
-        print 'Columna ' + str(find_column(lexer.lexdata, tok)) + ')'
-    sys.exit(0)
+        print 'tok(' + str(tok.type) + ')' + '            '[:-(len(tok.type))],
+        print 'val(' + str(tok.value) + ')',
+        print 'at line ' + str(tok.lineno) + ',',
+        print 'column ' + str(find_column(file_string, tok))
 
-# Si se ejecuta el modulo.
+
+# If this is the module running
 if __name__ == "__main__":
     main()
