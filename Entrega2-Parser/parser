@@ -84,18 +84,18 @@ def p_data_type(symbol):
 ###############################     IN/OUT      ###############################
 
 
-# The read statement, it works on a variable
-def p_statement_read(symbol):
-    "statement : READ ID"
+# The scan statement, it works on a variable
+def p_statement_scan(symbol):
+    "statement : scan ID"
     symbol[0] = Read(Variable(symbol[2]))
 
 
 # The write statement, it prints on standard output the list of elements
 # given to it, in order
-def p_statement_write(symbol):
-    """statement : WRITE comma_list
-                 | WRITELN comma_list"""
-    if symbol[1].upper() == 'WRITE':
+def p_statement_print(symbol):
+    """statement : PRINT comma_list
+                 | PRINTLN comma_list"""
+    if symbol[1].upper() == 'PRINT':
         symbol[0] = Write(symbol[2])
     else:
         if len(symbol) == 3:
@@ -104,7 +104,7 @@ def p_statement_write(symbol):
             symbol[0] = Write([String('"\\n"')])
 
 
-# To generate the list of elements for a 'write' or a 'writeln'
+# To generate the list of elements for a 'print' or a 'println'
 def p_statement_comma_list(symbol):
     """comma_list : expression
                   | comma_list COMMA expression"""
