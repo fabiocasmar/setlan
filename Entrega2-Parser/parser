@@ -270,7 +270,8 @@ def p_exp_set_unary(symbol):
     """expression : SETMAX   LPAREN expression RPAREN
                   | SETMINUS LPAREN expression RPAREN
                   | SETLEN   LPAREN expression RPAREN"""
-    symbol[0] = Unary(symbol[1].upper(), symbol[3])  #REVISAR: parentesis
+                  
+    symbol[0] = Unary(symbol[1].upper(), symbol[3])  #REVISAR: parentesis LPAREN y RPAREN
 
 # Binary operators defined for int
 def p_exp_int_set_binary(symbol):
