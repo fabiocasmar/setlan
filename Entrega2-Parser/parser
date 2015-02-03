@@ -234,44 +234,59 @@ def p_exp_int_binary(symbol):
                   | expression MINUS  expression
                   | expression TIMES  expression
                   | expression DIVIDE expression
-                  | expression MODULO expression"""
+                  | expression MODULE expression"""
     operator = {
         '+': 'PLUS',
         '-': 'MINUS',
         '*': 'TIMES',
         '/': 'DIVIDE',
-        '%': 'MODULO'
+        '%': 'MODULE'
     }[symbol[2]]
     symbol[0] = Binary(operator, symbol[1], symbol[3])
 
 
 # Unary minus, defined for int
 def p_exp_int_unary(symbol):
-    "expression : MINUS expression %prec UMINUS"
+    "expression : MINUS expression %prec UMINUS"  #REVISAR ESE %prec
     symbol[0] = Unary('MINUS', symbol[2])
 
 
 # Binary operators defined for range
-def p_exp_range_binary(symbol):
-    """expression : expression INTERSECTION expression"""
-                  # | expression PLUS         expression %prec UNION
-                  # | expression TIMES        expression %prec MAPTIMES"""
-    # operator = {
-    #     '+': 'UNION',
-    #     '<>': 'INTERSECTION',
-    #     '*': 'MAPTIMES'
-    # }[symbol[2]]
-    operator = 'INTERSECTION'
-    symbol[0] = Binary(operator, symbol[1], symbol[3])
+def p_exp_set_binary(symbol):
+    """expression : expression INTERSECTION expression
+                  | expression PLUS         expression %prec UNION
+                  | expression TIMES        expression %prec MAPTIMES"""
+    operator = {
+        '++': 'SETUNION',
+        '><': 'SETINTERSECTION',
+        '\\': 'SETDIFFERENCE'
+    }[symbol[2]]
+    # operator = 'INTERSECTION'
+    symbol[0] = Binary(operator, symbol[1], symbol[3])  #REVISAR: no estoy seguro de esta parte
 
 
 # Considered these functions as unary operators for range
-def p_exp_int_range_unary(symbol):
-    """expression : RTOI   LPAREN expression RPAREN
-                  | LENGTH LPAREN expression RPAREN
-                  | TOP    LPAREN expression RPAREN
-                  | BOTTOM LPAREN expression RPAREN"""
-    symbol[0] = Unary(symbol[1].upper(), symbol[3])
+def p_exp_set_unary(symbol):
+    """expression : SETMAX   LPAREN expression RPAREN
+                  | SETMINUS LPAREN expression RPAREN
+                  | SETLEN   LPAREN expression RPAREN"""
+    symbol[0] = Unary(symbol[1].upper(), symbol[3])  #REVISAR: parentesis
+
+# Binary operators defined for int
+def p_exp_int_set_binary(symbol):
+    """expression : expression SETPLUS   expression
+                  | expression SETMINUS  expression
+                  | expression SETTIMES  expression
+                  | expression SETDIVIDE expression
+                  | expression SETMODULE expression"""
+    operator = {
+        '<+>': 'SETPLUS',
+        '<->': 'SETMINUS',
+        '<*>': 'SETTIMES',
+        '</>': 'SETDIVIDE',
+        '<%>': 'SETMODULE'
+    }[symbol[2]]
+    symbol[0] = Binary(operator, symbol[1], symbol[3])
 
 
 # Binary operators defined for bool
