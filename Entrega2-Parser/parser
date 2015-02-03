@@ -173,17 +173,17 @@ precedence = (
     ("nonassoc", 'BELONG'),
     ("nonassoc", 'EQUAL', 'UNEQUAL'),
     ("nonassoc", 'LESS', 'LESSEQ', 'GREAT', 'GREATEQ'),
-    # range
-    ("left", 'INTERSECTION'),
-    # ("left", 'UNION'),
-    # ("nonassoc", 'MAPTIMES'),
+    # set 
+    ("left", 'SETUNION','SETDIFFERENCE')
+    ("left",'SETINTERSECTION')
+    ("right",'SETMAX','SETMIN','SETLEN')
+    # int over set
+    ("left", 'SETPLUS','SETMINUS'),
+    ("left", 'SETTIMES','SETDIVITION','SETMOD'),
     # int
     ("left", 'PLUS', 'MINUS'),
-    ("left", 'TIMES', 'DIVIDE', 'MODULO'),
-    # range
-    ("nonassoc", 'FROMTO'),
-    # int
-    ("right", 'UMINUS'),
+    ("left", 'TIMES', 'DIVIDE', 'MODULE'), 
+    ("right", 'UMINUS'),#revisar '-' para declarar un negativo
 )
 
 ##############################     LITERALS     ###############################
