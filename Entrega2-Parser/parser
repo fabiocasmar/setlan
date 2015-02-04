@@ -35,23 +35,23 @@ def p_statement_assing(symbol):
 # It has an optional declarations list and a list of statements
 # each declaration and each statement is separated by a ';'
 def p_statement_block(symbol):
-    """statement : BEGIN statement_list END
-                 | BEGIN DECLARE declare_list statement_list END"""
+    """statement : OPENCURLY statement_list CLOSECURLY
+                 | OPENCURLY USING declare_list IN statement_list CLOSECURLY"""
     if len(symbol) == 4:
         symbol[0] = Block(symbol[2])
     else:
         # symbol[0] = Block(symbol[4], symbol[3])
-        symbol[0] = Block(symbol[4])
+        symbol[0] = Block(symbol[5])
 
 
 # A grammar rule to create multiple declarations in a block statement
 def p_statement_declare_list(symbol):
-    """declare_list : declare_comma_list AS data_type
-                    | declare_list SEMICOLON declare_comma_list AS data_type"""
+    """declare_list : data_type declare_comma_list SEMICOLON
+                    | declare_list SEMICOLON data_type declare_comma_list SEMICOLON"""
     if len(symbol) == 4:
-        symbol[0] = [(symbol[1], symbol[3])]
+        symbol[0] = [(symbol[2], symbol[1])]
     else:
-        symbol[0] = symbol[1] + [(symbol[3], symbol[5])]
+        symbol[0] = symbol[1] + [(symbol[4], symbol[3])]
 
 
 # A grammar rule to create multiple variables in a declaration
@@ -78,7 +78,7 @@ def p_statement_statement_list(symbol):
 def p_data_type(symbol):
     """data_type : INT
                  | BOOL
-                 | RANGE"""
+                 | SET"""
     symbol[0] = symbol[1]
 
 ###############################     IN/OUT      ###############################
@@ -87,7 +87,7 @@ def p_data_type(symbol):
 # The scan statement, it works on a variable
 def p_statement_scan(symbol):
     "statement : scan ID"
-    symbol[0] = Read(Variable(symbol[2]))
+    symbol[0] = Scan(Variable(symbol[2]))
 
 
 # The write statement, it prints on standard output the list of elements
@@ -96,12 +96,12 @@ def p_statement_print(symbol):
     """statement : PRINT comma_list
                  | PRINTLN comma_list"""
     if symbol[1].upper() == 'PRINT':
-        symbol[0] = Write(symbol[2])
+        symbol[0] = Print(symbol[2])
     else:
         if len(symbol) == 3:
-            symbol[0] = Write(symbol[2] + [String('"\\n"')])
+            symbol[0] = Print(symbol[2] + [String('"\\n"')])
         else:
-            symbol[0] = Write([String('"\\n"')])
+            symbol[0] = Print([String('"\\n"')])
 
 
 # To generate the list of elements for a 'print' or a 'println'
@@ -118,29 +118,13 @@ def p_statement_comma_list(symbol):
 
 # The if statement, it may or may not have an 'else'
 def p_statement_if(symbol):
-    """statement : IF expression THEN statement
-                 | IF expression THEN statement ELSE statement"""
+    """statement : IF OPENPAREN expression CLOSEPAREN THEN statement
+                 | IF OPENPAREN expression CLOSEPAREN THEN statement ELSE statement"""
     if len(symbol) == 5:
         symbol[0] = If(symbol[2], symbol[4])
     else:
         symbol[0] = If(symbol[2], symbol[4], symbol[6])
 
-
-# The case statement, an integer to check if is in a series of ranges
-# If in the range, run the statement for this one
-def p_statement_case(symbol):
-    "statement : CASE expression OF case_list END"
-    symbol[0] = Case(symbol[2], symbol[4])
-
-
-# A list of range '->' statement
-def p_statement_case_list(symbol):
-    """case_list : expression ARROW statement SEMICOLON
-                 | case_list expression ARROW statement SEMICOLON"""
-    if len(symbol) == 5:
-        symbol[0] = [(symbol[1], symbol[3])]
-    else:
-        symbol[0] = symbol[1] + [(symbol[2], symbol[4])]
 
 ###############################     LOOP      #################################
 
@@ -148,14 +132,27 @@ def p_statement_case_list(symbol):
 # The for statement, automatically declares an 'int' variable in the scope of
 # the for, this variable has a value of every value in the range specified
 def p_statement_for(symbol):
-    "statement : FOR ID IN expression DO statement"
-    symbol[0] = For(Variable(symbol[2]), symbol[4], symbol[6])
+    """statement : FOR ID MAX expression DO statement
+                 | FOR ID MIN expression DO statement"""
+    symbol[0] = For(Variable(symbol[2]), symbol[4], symbol[6], symbol[3])
 
 
 # The while statement, while some condition holds, keep doing a statement
 def p_statement_while(symbol):
-    "statement : WHILE expression DO statement"
-    symbol[0] = While(symbol[2], symbol[4])
+    "statement : WHILE OPENPAREN expression CLOSEPAREN DO statement"
+    symbol[0] = While(symbol[3], symbol[6])
+
+# The while statement, while some condition holds, keep doing a statement
+def p_statement_repeat(symbol):
+    "statement : REPEAT statement WHILE OPENPAREN expression CLOSEPAREN "
+    symbol[0] = Repeat(symbol[2], symbol[5])
+
+
+# The while statement, while some condition holds, keep doing a statement
+def p_statement_repeat_while(symbol):
+    "statement : REPEAT statment WHILE OPENPAREN expression CLOSEPAREN DO statement"
+    symbol[0] = RepeatWhile(symbol[2], symbol[5], symbol[8])
+
 
 ###############################################################################
 #############################     EXPRESSIONS     #############################
@@ -204,8 +201,8 @@ def p_exp_bool_literal(symbol):
 
 # A range is a valid expression
 def p_exp_range_literal(symbol):
-    "expression : expression FROMTO expression"
-    symbol[0] = Range(symbol[1], symbol[3])
+    "expression : OPENCURLY comma_list CLOSECURLY"
+    symbol[0] = Set(symbol[1], symbol[3])
 
 
 # A string is a valid expression
