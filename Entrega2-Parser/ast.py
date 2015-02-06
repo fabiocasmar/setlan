@@ -42,7 +42,7 @@ class Block(Statement):
         self.statements = statements
 
     def print_tree(self, level):
-        string = indent(level) + "BEGIN\n"
+        string = indent(level) + "BLOCK\n"
         # if self.declarations:
         #     string += indent(level) + "DECLARATIONS\n"
         #     for decl in self.declarations:
@@ -59,7 +59,7 @@ class Block(Statement):
             string += stat.print_tree(level + 1) + '\n'
             string += indent(level + 1) + "SEPARATOR\n"
         string = string[:(-10 - len(indent(1)))]
-        string += "END"
+        string += "BLOCK_END"
         return string
 
 
@@ -222,19 +222,18 @@ class Bool(Expression):
 
 class Set(Expression):
     """Class to define an expression of range"""
-    def __init__(self, from_value, to_value):
+    def __init__(self, valores):
         # self.type = "range"
-        self.from_value = from_value
-        self.to_value = to_value
+        self.valores = valores
 
     def __str__(self):
-        return str(self.from_value) + '..' + str(self.to_value)
+        return str(self.valores) + '..' + str(self.valores)
 
     def print_tree(self, level):
-        string = indent(level) + "FROM:\n"
-        string += self.from_value.print_tree(level + 1) + '\n'
-        string += indent(level) + "TO:\n"
-        string += self.to_value.print_tree(level + 1)
+        string = indent(level) + "VALORES:\n" + indent(level+1) + " {" 
+        for i in self.valores:
+            string+= str(i)+','
+        string +=  '} \n'
         return string
 
 

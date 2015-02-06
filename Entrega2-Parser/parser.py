@@ -30,6 +30,7 @@ def p_statement_assing(symbol):
     symbol[0] = Assign(Variable(symbol[1]), symbol[3])
 
 
+
 # The block statement
 # starts with 'begin' and ends with 'end'
 # It has an optional declarations list and a list of statements
@@ -47,11 +48,11 @@ def p_statement_block(symbol):
 # A grammar rule to create multiple declarations in a block statement
 def p_statement_declare_list(symbol):
     """declare_list : data_type declare_comma_list SEMICOLON
-                    | declare_list SEMICOLON data_type declare_comma_list SEMICOLON"""
+                    | declare_list data_type declare_comma_list SEMICOLON"""
     if len(symbol) == 4:
         symbol[0] = [(symbol[2], symbol[1])]
     else:
-        symbol[0] = symbol[1] + [(symbol[4], symbol[3])]
+        symbol[0] = symbol[1] + [(symbol[3], symbol[2])]
 
 
 # A grammar rule to create multiple variables in a declaration
@@ -66,19 +67,19 @@ def p_statement_declare_comma_list(symbol):
 
 # Multiple statements in a block statement have a separation token, the ';'
 def p_statement_statement_list(symbol):
-    """statement_list : statement SEMICOLON
-                      | statement_list SEMICOLON statement"""
-    if len(symbol) == 3:
-        symbol[0] = [symbol[1]]
+    """statement_list : 
+                      | statement_list statement SEMICOLON"""
+    if len(symbol) == 1:
+        symbol[0] = []
     else:
-        symbol[0] = symbol[1] + [symbol[3]]
+        symbol[0] = symbol[1] + [symbol[2]]
 
 
 # For the 'as' part of a declaration
 def p_data_type(symbol):
     """data_type : INT
                  | BOOL
-                 | SET"""
+                 | SET """
     symbol[0] = symbol[1]
 
 ###############################     IN/OUT      ###############################
@@ -118,15 +119,16 @@ def p_statement_comma_list(symbol):
 
 # The if statement, it may or may not have an 'else'
 def p_statement_if(symbol):
-    """statement :  IF OPENPAREN expression CLOSEPAREN  statement2"""
-    if len(symbol) == 5:
-        symbol[0] = If(symbol[2], symbol[4])
+    """statement :  IF OPENPAREN expression CLOSEPAREN  statement ELSE statement
+                  |   IF OPENPAREN expression CLOSEPAREN  statement  """
+    if len(symbol) == 6:
+        symbol[0] = If(symbol[3], symbol[5])
     else:
-        symbol[0] = If(symbol[2], symbol[4], symbol[6])
+        symbol[0] = If(symbol[3], symbol[5], symbol[7])
 
-def p_statment_2(symbol):
-     """statement2 : ELSE statement
-                  |              """
+# def p_statment_2(symbol):
+#      """statement2 : statement ELSE statement
+#                   |  statement """
 
 ###############################     LOOP      #################################
 
@@ -163,6 +165,9 @@ def p_statement_repeat_while(symbol):
 
 # Precedence defined for expressions
 precedence = (
+    # language
+    ("right", 'CLOSEPAREN'),
+    ("right", 'ELSE'),
     # bool
     ("left", 'OR'),
     ("left", 'AND'),
@@ -202,9 +207,9 @@ def p_exp_bool_literal(symbol):
 
 
 # A range is a valid expression
-def p_exp_range_literal(symbol):
+def p_exp_set_literal(symbol):
     "expression : OPENCURLY comma_list CLOSECURLY"
-    symbol[0] = Set(symbol[1], symbol[3])
+    symbol[0] = Set(symbol[2])
 
 
 # A string is a valid expression
@@ -266,12 +271,12 @@ def p_exp_set_binary(symbol):
 
 # Considered these functions as unary operators for range
 def p_exp_set_unary(symbol):
-    """expression : SETMAX   OPENPAREN expression CLOSEPAREN
-                  | SETMIN   OPENPAREN expression CLOSEPAREN
-                  | SETMINUS OPENPAREN expression CLOSEPAREN
-                  | SETLEN   OPENPAREN expression CLOSEPAREN"""
+    """expression : SETMAX   expression 
+                  | SETMIN   expression 
+                  | SETMINUS expression 
+                  | SETLEN   expression """
                   
-    symbol[0] = Unary(symbol[1].upper(), symbol[3])  #REVISAR: parentesis LPAREN y RPAREN
+    symbol[0] = Unary(symbol[1].upper(), symbol[2])  #REVISAR: parentesis LPAREN y RPAREN
 
 # Binary operators defined for int
 def p_exp_int_set_binary(symbol):
