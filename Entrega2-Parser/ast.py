@@ -144,6 +144,38 @@ class While(Statement):
         string += self.statement.print_tree(level + 2)
         return string
 
+class Repeat(Statement):
+    """While statement, takes a condition"""
+    def __init__(self, statement, condition):
+        # self.type = "while"
+        self.condition = condition
+        self.statement = statement
+
+    def print_tree(self, level):
+        string = indent(level) + "WHILE\n"
+        string += indent(level + 1) + "DO statement:\n"
+        string += self.statement.print_tree(level + 2)
+        string += indent(level + 1) + "condition:\n"
+        string += self.condition.print_tree(level + 2) + '\n'
+        return string
+
+class RepeatWhile(Statement):
+    """While statement, takes a condition"""
+    def __init__(self, statement, condition, statement2):
+        # self.type = "while"
+        self.condition  = condition
+        self.statement  = statement
+        self.statement2 = statement2
+
+    def print_tree(self, level):
+        string = indent(level) + "WHILE\n"
+        string += indent(level + 1) + "DO statement:\n"
+        string += self.statement.print_tree(level + 2)
+        string += indent(level + 1) + "condition:\n"
+        string += self.condition.print_tree(level + 2) + '\n'
+        string += indent(level + 1) + "DO statement2:\n"
+        string += self.statement2.print_tree(level + 2)
+        return string
 
 # For inheritance
 class Expression: pass

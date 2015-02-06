@@ -6,117 +6,122 @@
 #Fabio, Castro, 10-10132
 #Antonio, Scaramazza 11-10957
 ####
-
 import ply.lex as lex
 
 # Palabras reservadas del lenguaje
 reserved = {
     # lenguaje
-    'program' : 'Program',
+    'program' : 'PROGRAM',
 
     # tipos
-    'int' : 'Int',
-    'bool' : 'Bool',
-    'set' : 'Set',
+    'int' : 'INT',
+    'bool' : 'BOOL',
+    'set' : 'SET',
 
     ## valores
-    'true' : 'True',
-    'false' : 'False',
+    'true' : 'TRUE',
+    'false' : 'FALSE',
 
     # instrucciones
-    'using' : 'Using',
-    'in' : 'In',
+    'using' : 'USING',
+    'in' : 'IN',
 
     ## condicionales
-    'if' : 'If',
-    'else' : 'Else',
+    'if' : 'IF',
+    'else' : 'ELSE',
 
     ## lazos
-    'repeat' : 'Repeat',
-    'while' : 'While',
+    'repeat' : 'REPEAT',
+    'while' : 'WHILE',
 
-    'do': 'Do',
+    'do': 'DO',
 
-    'for' : 'For',
+    'for' : 'FOR',
+
+    # Especiales del FOR
+
+    'min':'MIN',
+    'max':'MAX',
 
     ## entrada/salida
-    'scan' : 'Scan',
+    'scan' : 'SCAN',
 
-    'print' : 'Print',
-    'println' : 'PrintLn',
+    'print' : 'PRINT',
+    'println' : 'PRINTLN',
 
     # expresiones/operadores
-    'or' : 'Or',
-    'and' : 'And',
-    'not' : 'Not',
+    'or' : 'OR',
+    'and' : 'AND',
+    'not' : 'NOT',
 
     ## funciones
-    'def' : 'Def',
-    'return': 'Return'
+    #'def' : 'DEF',
+    #'return': 'RETURN'
 }
 
 # Tokens a ser reconocidos
 tokens = [
     # Lenguaje
-    'Number',
-    'Comma',
-    'SemiColon',
-    'Assign',
+    'NUMBER',
+    'COMMA',
+    'SEMICOLON',
+    'ASSIGN',
 
-    # Identificadores
+    # IDENTIFICADORES
     'ID',
 
-    # Instrucciones
-    'Arrow',
-    'String',
+    # INSTRUCCIONES
+    'ARROW',
+    'STRING',
 
-    # Expresiones/Operadores
-        # Operadores de Conjuntos
-            'SetPlus',
-            'SetMinus',
-            'SetTimes',
-            'SetMod',
-            'SetDivition',
-            'SetMax',
-            'SetMin',
-            'SetLen',
-            'SetIntersection',
-            'SetUnion',
-            'SetDifference',
-        # Operadores de Enteros
-            'Plus',
-            'Minus',
-            'Times',
-            'Divide',
-            'Module',
-        #  Operadores Booleanos
-            'Less',
-            'LessEq',
-            'Great',
-            'GreatEq',
-            'Equal',
-            'UnEqual',
-            # Operadores Booleanos sobre Conjuntos
-                'SetBelong',   
-        #  Parentizacion
-           'OpenParen',
-           'CloseParen',
-           'OpenCurly',
-           'CloseCurly'
+    # EXPRESIONES/OPERADORES
+        # OPERADORES DE CONJUNTOS
+            'SETPLUS',
+            'SETMINUS',
+            'SETTIMES',
+            'SETMOD',
+            'SETDIVITION',
+            'SETMAX',
+            'SETMIN',
+            'SETLEN',
+            'SETINTERSECTION',
+            'SETUNION',
+            'SETDIFFERENCE',
+        # OPERADORES DE Enteros
+            'PLUS',
+            'MINUS',
+            'TIMES',
+            'DIVIDE',
+            'MODULE',
+        #  OPERADORES BOOLEANOS
+            'LESS',
+            'LESSEQ',
+            'GREAT',
+            'GREATEQ',
+            'EQUAL',
+            'UNEQUAL',
+            # OPERADORES BOOLEANOS SOBRE CONJUNTOS
+                'SETBELONG',   
+        #  PARENTIZACION
+           'OPENPAREN',
+           'CLOSEPAREN',
+           'OPENCURLY',
+           'CLOSECURLY'
 ] + list(reserved.values())
 
-# Devuelve el valor almacenado en el tipo entero de Python
-def t_Number(t):
-    r'\d+'
-    val = int(t.value)
-    if val > 2147483648:
-        error_NUMBER(t)
-    t.value = val
-    return t
 
-t_Comma = r','
-t_SemiColon = r';'
-t_Assign = r'='
+
+def t_NUMBER(token):
+    r'\d+'
+    val = int(token.value)
+    if val > 2147483648:
+        error_NUMBER(token)
+    token.value = val
+    return token
+
+t_COMMA = r','
+t_SEMICOLON = r';'
+t_ASSIGN = r'='
 
 def t_ID(t):
     r'\w[\w\d]*'
@@ -124,7 +129,7 @@ def t_ID(t):
     t.type = reserved.get(t.value, 'ID')
     return t
 
-t_Arrow = r'->'
+t_ARROW = r'->'
 
 # Los Strings almacenan toda entrada sin importar los saltos de linea
 # Siempre que estas esten entre " "
@@ -132,41 +137,41 @@ t_Arrow = r'->'
 t_STRING = r'\"([^\\\n]|(\\(n|"|\\)))*?\"'
 
 # token de conjuntos
-t_SetPlus = r'\<\+\>'
-t_SetMinus = r'\<\-\>'
-t_SetTimes = r'\<\*\>'
-t_SetDivition = r'\<\/\>'
-t_SetMod = r'\<\%\>'
-t_SetMax = r'\>\?'
-t_SetMin = r'\<\?'
-t_SetLen = r'\$\?'
-t_SetIntersection = r'\>\<'
-t_SetUnion = r'\+\+'
-t_SetDifference = r'\\'
+t_SETPLUS = r'\<\+\>'
+t_SETMINUS = r'\<\-\>'
+t_SETTIMES = r'\<\*\>'
+t_SETDIVITION = r'\<\/\>'
+t_SETMOD = r'\<\%\>'
+t_SETMAX = r'\>\?'
+t_SETMIN = r'\<\?'
+t_SETLEN = r'\$\?'
+t_SETINTERSECTION = r'\>\<'
+t_SETUNION = r'\+\+'
+t_SETDIFFERENCE = r'\\'
 
 # token de entero
-t_Plus = r'\+'
-t_Minus = r'-'
-t_Times = r'\*'
-t_Divide = r'/'
-t_Module = r'%'
+t_PLUS = r'\+'
+t_MINUS = r'-'
+t_TIMES = r'\*'
+t_DIVIDE = r'/'
+t_MODULE = r'%'
 
 # token de booleano
-t_Less = r'\<'
-t_LessEq = r'\<\='
-t_Great = r'\>'
-t_GreatEq = r'\>\='
-t_Equal = r'\=\='
-t_UnEqual = r'\/\='
+t_LESS = r'\<'
+t_LESSEQ = r'\<\='
+t_GREAT = r'\>'
+t_GREATEQ = r'\>\='
+t_EQUAL = r'\=\='
+t_UNEQUAL = r'\/\='
 
 #token de booleano sobre entero
-t_SetBelong = r'\@'
+t_SETBELONG = r'\@'
 
 # parentizacion
-t_OpenParen = r'\('
-t_CloseParen = r'\)'
-t_OpenCurly = r'\{'
-t_CloseCurly = r'\}'
+t_OPENPAREN = r'\('
+t_CLOSEPAREN = r'\)'
+t_OPENCURLY = r'\{'
+t_CLOSECURLY = r'\}'
 
 # Ignora espacion, tabuladores y comentarios en formato C
 t_ignore = " \t"
@@ -206,7 +211,6 @@ def error_NUMBER(token):
     message = "Error: Overflow for int '%s' at line %d, column %d"
     data = (token.value, token.lineno, find_column(text, token))
     lexer_error.append(message % data)
-
 
 # Build the lexer
 lex.lex()

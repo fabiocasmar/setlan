@@ -86,7 +86,7 @@ def p_data_type(symbol):
 
 # The scan statement, it works on a variable
 def p_statement_scan(symbol):
-    "statement : scan ID"
+    "statement : SCAN ID"
     symbol[0] = Scan(Variable(symbol[2]))
 
 
@@ -118,8 +118,8 @@ def p_statement_comma_list(symbol):
 
 # The if statement, it may or may not have an 'else'
 def p_statement_if(symbol):
-    """statement : IF OPENPAREN expression CLOSEPAREN THEN statement
-                 | IF OPENPAREN expression CLOSEPAREN THEN statement ELSE statement"""
+    """statement :  IF OPENPAREN expression CLOSEPAREN  statement ELSE statement
+                |   IF OPENPAREN expression CLOSEPAREN  statement"""
     if len(symbol) == 5:
         symbol[0] = If(symbol[2], symbol[4])
     else:
@@ -150,7 +150,7 @@ def p_statement_repeat(symbol):
 
 # The while statement, while some condition holds, keep doing a statement
 def p_statement_repeat_while(symbol):
-    "statement : REPEAT statment WHILE OPENPAREN expression CLOSEPAREN DO statement"
+    "statement : REPEAT statement WHILE OPENPAREN expression CLOSEPAREN DO statement"
     symbol[0] = RepeatWhile(symbol[2], symbol[5], symbol[8])
 
 
@@ -167,13 +167,13 @@ precedence = (
     ("right", 'NOT'),
     # ("left", 'EQUIVALENT', 'INEQUIVALENT'),
     # compare
-    ("nonassoc", 'BELONG'),
+    ("nonassoc", 'SETBELONG'),
     ("nonassoc", 'EQUAL', 'UNEQUAL'),
     ("nonassoc", 'LESS', 'LESSEQ', 'GREAT', 'GREATEQ'),
     # set 
-    ("left", 'SETUNION','SETDIFFERENCE')
-    ("left",'SETINTERSECTION')
-    ("right",'SETMAX','SETMIN','SETLEN')
+    ("left", 'SETUNION','SETDIFFERENCE'),
+    ("left",'SETINTERSECTION'),
+    ("right",'SETMAX','SETMIN','SETLEN'),
     # int over set
     ("left", 'SETPLUS','SETMINUS'),
     ("left", 'SETTIMES','SETDIVITION','SETMOD'),
@@ -219,7 +219,7 @@ def p_expression_id(symbol):
 
 # An expression between parenthesis is still an expression
 def p_expression_group(symbol):
-    """expression : LPAREN expression RPAREN"""
+    """expression : OPENPAREN expression CLOSEPAREN"""
     symbol[0] = symbol[2]
 
 #############################     OPERATORS     ###############################
@@ -248,11 +248,11 @@ def p_exp_int_unary(symbol):
     symbol[0] = Unary('MINUS', symbol[2])
 
 
-# Binary operators defined for range
+# Binary operators defined for set
 def p_exp_set_binary(symbol):
-    """expression : expression INTERSECTION expression
-                  | expression PLUS         expression %prec UNION
-                  | expression TIMES        expression %prec MAPTIMES"""
+    """expression : expression SETUNION expression
+                  | expression SETINTERSECTION         expression 
+                  | expression SETDIFFERENCE        expression """
     operator = {
         '++': 'SETUNION',
         '><': 'SETINTERSECTION',
@@ -264,9 +264,10 @@ def p_exp_set_binary(symbol):
 
 # Considered these functions as unary operators for range
 def p_exp_set_unary(symbol):
-    """expression : SETMAX   LPAREN expression RPAREN
-                  | SETMINUS LPAREN expression RPAREN
-                  | SETLEN   LPAREN expression RPAREN"""
+    """expression : SETMAX   OPENPAREN expression CLOSEPAREN
+                  | SETMIN   OPENPAREN expression CLOSEPAREN
+                  | SETMINUS OPENPAREN expression CLOSEPAREN
+                  | SETLEN   OPENPAREN expression CLOSEPAREN"""
                   
     symbol[0] = Unary(symbol[1].upper(), symbol[3])  #REVISAR: parentesis LPAREN y RPAREN
 
@@ -275,14 +276,14 @@ def p_exp_int_set_binary(symbol):
     """expression : expression SETPLUS   expression
                   | expression SETMINUS  expression
                   | expression SETTIMES  expression
-                  | expression SETDIVIDE expression
-                  | expression SETMODULE expression"""
+                  | expression SETDIVITION expression
+                  | expression SETMOD expression"""
     operator = {
         '<+>': 'SETPLUS',
         '<->': 'SETMINUS',
         '<*>': 'SETTIMES',
-        '</>': 'SETDIVIDE',
-        '<%>': 'SETMODULE'
+        '</>': 'SETDIVITION',
+        '<%>': 'SETMOD'
     }[symbol[2]]
     symbol[0] = Binary(operator, symbol[1], symbol[3])
 
@@ -334,8 +335,8 @@ def p_exp_bool_compare(symbol):
 
 # Binary oprator defined for an int and a range
 def p_exp_bool_int_range(symbol):
-    "expression : expression BELONG expression"
-    symbol[0] = Binary('BELONG', symbol[1], symbol[3])
+    "expression : expression SETBELONG expression"
+    symbol[0] = Binary('SETBELONG', symbol[1], symbol[3])
 
 
 # Commented in case of need afterwards
