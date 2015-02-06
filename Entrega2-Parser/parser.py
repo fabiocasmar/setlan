@@ -66,9 +66,9 @@ def p_statement_declare_comma_list(symbol):
 
 # Multiple statements in a block statement have a separation token, the ';'
 def p_statement_statement_list(symbol):
-    """statement_list : statement
+    """statement_list : statement SEMICOLON
                       | statement_list SEMICOLON statement"""
-    if len(symbol) == 2:
+    if len(symbol) == 3:
         symbol[0] = [symbol[1]]
     else:
         symbol[0] = symbol[1] + [symbol[3]]
@@ -118,13 +118,15 @@ def p_statement_comma_list(symbol):
 
 # The if statement, it may or may not have an 'else'
 def p_statement_if(symbol):
-    """statement :  IF OPENPAREN expression CLOSEPAREN  statement ELSE statement
-                |   IF OPENPAREN expression CLOSEPAREN  statement"""
+    """statement :  IF OPENPAREN expression CLOSEPAREN  statement2"""
     if len(symbol) == 5:
         symbol[0] = If(symbol[2], symbol[4])
     else:
         symbol[0] = If(symbol[2], symbol[4], symbol[6])
 
+def p_statment_2(symbol):
+     """statement2 : ELSE statement
+                  |              """
 
 ###############################     LOOP      #################################
 

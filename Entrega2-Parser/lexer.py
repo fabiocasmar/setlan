@@ -71,7 +71,6 @@ tokens = [
     'ID',
 
     # INSTRUCCIONES
-    'ARROW',
     'STRING',
 
     # EXPRESIONES/OPERADORES
@@ -129,7 +128,6 @@ def t_ID(t):
     t.type = reserved.get(t.value, 'ID')
     return t
 
-t_ARROW = r'->'
 
 # Los Strings almacenan toda entrada sin importar los saltos de linea
 # Siempre que estas esten entre " "
