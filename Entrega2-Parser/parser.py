@@ -258,8 +258,8 @@ def p_exp_int_unary(symbol):
 # Binary operators defined for set
 def p_exp_set_binary(symbol):
     """expression : expression SETUNION expression
-                  | expression SETINTERSECTION         expression 
-                  | expression SETDIFFERENCE        expression """
+                  | expression SETINTERSECTION expression 
+                  | expression SETDIFFERENCE expression """
     operator = {
         '++': 'SETUNION',
         '><': 'SETINTERSECTION',
