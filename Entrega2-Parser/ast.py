@@ -58,8 +58,8 @@ class Block(Statement):
         for stat in self.statements:
             string += stat.print_tree(level + 1) + '\n'
             string += indent(level + 1) + "SEPARATOR\n"
-        string = string[:(-10 - len(indent(1)))]
-        string += "BLOCK_END"
+        #string = string[:(-10 - len(indent(1)))]
+        string += indent(level) + "BLOCK_END"
         return string
 
 
@@ -230,10 +230,9 @@ class Set(Expression):
         return str(self.valores) + '..' + str(self.valores)
 
     def print_tree(self, level):
-        string = indent(level) + "VALORES:\n" + indent(level+1) + " {" 
+        string = indent(level) + "VALORES:\n" 
         for i in self.valores:
-            string+= str(i)+','
-        string +=  '} \n'
+            string+= i.print_tree(level+1)+ '\n'
         return string
 
 
