@@ -52,7 +52,6 @@ EXPRESSION -> 'number'
            |  EXPRESSION '\\' EXPRESSION 
            |  SETMAX   EXPRESSION 
            |  SETMIN   EXPRESSION 
-           |  SETMINUS EXPRESSION 
            |  SETLEN   EXPRESSION 
            |  '-' EXPRESSION
            |  'not' EXPRESSION
