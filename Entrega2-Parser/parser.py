@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-"""Parser for RangeX Language
+"""Parser for Setlan Language
 Fabio, Castro 10-10132
 Antonio, Scaramazza 11-10957
 """
@@ -12,7 +12,7 @@ from ast import *
 
 
 # The first rule to evaluate
-# A RangeX program always begins with the reserved word 'program'
+# A Setlan program always begins with the reserved word 'program'
 # and has one, and only one statement next
 def p_program(symbol):
     "program : PROGRAM statement"
@@ -265,7 +265,6 @@ def p_exp_set_binary(symbol):
         '><': 'SETINTERSECTION',
         '\\': 'SETDIFFERENCE'
     }[symbol[2]]
-    # operator = 'INTERSECTION'
     symbol[0] = Binary(operator, symbol[1], symbol[3])  #REVISAR: no estoy seguro de esta parte
 
 
@@ -274,8 +273,13 @@ def p_exp_set_unary(symbol):
     """expression : SETMAX   expression 
                   | SETMIN   expression 
                   | SETLEN   expression """
-                  
-    symbol[0] = Unary(symbol[1].upper(), symbol[2])  #REVISAR: parentesis LPAREN y RPAREN
+    operator = {
+        '>?': 'SETMAX',
+        '<?': 'SETMIN',
+        '$?': 'SETLEN'
+    }[symbol[1]]              
+
+    symbol[0] = Unary(operator, symbol[2])  #REVISAR: parentesis LPAREN y RPAREN
 
 # Binary operators defined for int
 def p_exp_int_set_binary(symbol):
@@ -298,13 +302,9 @@ def p_exp_int_set_binary(symbol):
 def p_exp_bool_binary(symbol):
     """expression : expression OR      expression
                   | expression AND     expression"""
-                  # | expression EQUAL   expression %prec EQUIVALENT
-                  # | expression UNEQUAL expression %prec INEQUIVALENT"""
     operator = {
         'or': 'OR',
         'and': 'AND',
-        # '==': 'EQUIVALENT',
-        # '/=': 'INEQUIVALENT'
     }[symbol[2]]
     symbol[0] = Binary(operator, symbol[1], symbol[3])
 
@@ -343,28 +343,6 @@ def p_exp_bool_compare(symbol):
 def p_exp_bool_int_range(symbol):
     "expression : expression SETBELONG expression"
     symbol[0] = Binary('SETBELONG', symbol[1], symbol[3])
-
-
-# Commented in case of need afterwards
-########################
-# def p_exp_bool_range_binary(symbol):
-#     """expression : expression LESS    expression
-#                   | expression LESSEQ  expression
-#                   | expression GREAT   expression
-#                   | expression GREATEQ expression
-#                   | expression EQUAL   expression
-#                   | expression UNEQUAL expression"""
-#     operator = {
-#         '<': 'RLESS',
-#         '<=': 'RLESSEQ',
-#         '>': 'RGREAT',
-#         '>=': 'RGREATEQ',
-#         '==': 'REQUAL',
-#         '/=': 'RUNEQUAL'
-#     }[symbol[2]]
-#     symbol[0] = Binary(operator, symbol[1], symbol[3])
-
-################################## ERROR ######################################
 
 
 # Error to be shown if the parser finds a Syntax error
