@@ -274,7 +274,7 @@ def p_exp_set_unary(symbol):
         '$?': 'SETLEN'
     }[symbol[1]]              
 
-    symbol[0] = Unary(operator, symbol[2])  #REVISAR: parentesis LPAREN y RPAREN
+    symbol[0] = Unary(operator, symbol[2]) 
 
 # Operadores binarios de conjuntos sobre enteros
 def p_exp_int_set_binary(symbol):
@@ -288,7 +288,7 @@ def p_exp_int_set_binary(symbol):
         '<->': 'SETMINUS',
         '<*>': 'SETTIMES',
         '</>': 'SETDIVITION',
-        '<%>': 'SETMOD'
+        '<%>': 'SETMOD',
     }[symbol[2]]
     symbol[0] = Binary(operator, symbol[1], symbol[3])
 
@@ -335,7 +335,7 @@ def p_exp_bool_compare(symbol):
 
 
 # Operador binario de entero en conjunto
-def p_exp_bool_int_range(symbol):
+def p_exp_bool_int_set(symbol):
     "expression : expression SETBELONG expression"
     symbol[0] = Binary('SETBELONG', symbol[1], symbol[3])
 

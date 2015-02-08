@@ -1,0 +1,9 @@
+program { 
+	if (5 @ a ){
+
+	};
+	print <? b;
+	print $? c;
+	print -c;
+	print a \ b;
+}
