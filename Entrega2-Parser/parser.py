@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-"""Parser for Setlan Language
+"""Parser para el lenguaje Setlan
 Fabio, Castro 10-10132
 Antonio, Scaramazza 11-10957
 """
@@ -11,9 +11,8 @@ from lexer import tokens, lexer_error, find_column
 from ast import *
 
 
-# The first rule to evaluate
-# A Setlan program always begins with the reserved word 'program'
-# and has one, and only one statement next
+# Primera regla a evaluar
+# Un programa Setlan siempre comienza con la palabra reservada 'program'
 def p_program(symbol):
     "program : PROGRAM statement"
     symbol[0] = Program(symbol[2])
@@ -23,18 +22,17 @@ def p_program(symbol):
 ###############################################################################
 
 
-# The assign statement
-# ID '=' expression
+# Declaracion de asignacion
+# ID '=' expresion
 def p_statement_assing(symbol):
     "statement : ID ASSIGN expression"
     symbol[0] = Assign(Variable(symbol[1]), symbol[3])
 
 
 
-# The block statement
-# starts with 'begin' and ends with 'end'
-# It has an optional declarations list and a list of statements
-# each declaration and each statement is separated by a ';'
+# Declaracion de bloque
+# posee un bloque opcional de declaracion de variables
+# este comienza con 'using' y termina con 'in'
 def p_statement_block(symbol):
     """statement : OPENCURLY statement_list CLOSECURLY
                  | OPENCURLY USING declare_list IN statement_list CLOSECURLY"""
@@ -45,7 +43,7 @@ def p_statement_block(symbol):
         symbol[0] = Block(symbol[5])
 
 
-# A grammar rule to create multiple declarations in a block statement
+# Regla de la gramatica para declarar el tipo de una variable
 def p_statement_declare_list(symbol):
     """declare_list : data_type declare_comma_list SEMICOLON
                     | declare_list data_type declare_comma_list SEMICOLON"""
@@ -55,7 +53,7 @@ def p_statement_declare_list(symbol):
         symbol[0] = symbol[1] + [(symbol[3], symbol[2])]
 
 
-# A grammar rule to create multiple variables in a declaration
+# Regla para crear una lista con el nombre de las variables
 def p_statement_declare_comma_list(symbol):
     """declare_comma_list : ID
                           | declare_comma_list COMMA ID"""
@@ -65,7 +63,7 @@ def p_statement_declare_comma_list(symbol):
         symbol[0] = symbol[1] + [Variable(symbol[3])]
 
 
-# Multiple statements in a block statement have a separation token, the ';'
+# Las declaraciones se separan por un ';'
 def p_statement_statement_list(symbol):
     """statement_list : 
                       | statement_list statement SEMICOLON"""
@@ -75,7 +73,7 @@ def p_statement_statement_list(symbol):
         symbol[0] = symbol[1] + [symbol[2]]
 
 
-# For the 'as' part of a declaration
+# Tipos permitidos del lenguaje
 def p_data_type(symbol):
     """data_type : INT
                  | BOOL
@@ -85,14 +83,13 @@ def p_data_type(symbol):
 ###############################     IN/OUT      ###############################
 
 
-# The scan statement, it works on a variable
+# Declaracion scan, se aplica sobre una variable 
 def p_statement_scan(symbol):
     "statement : SCAN ID"
     symbol[0] = Scan(Variable(symbol[2]))
 
 
-# The write statement, it prints on standard output the list of elements
-# given to it, in order
+# Comando 'print', muestra por pantalla las expresiones dadas
 def p_statement_print(symbol):
     """statement : PRINT comma_list
                  | PRINTLN comma_list"""
@@ -105,7 +102,7 @@ def p_statement_print(symbol):
             symbol[0] = Print([String('"\\n"')])
 
 
-# To generate the list of elements for a 'print' or a 'println'
+# Lista de elementos a imprimir con la funcion 'print' 
 def p_statement_comma_list(symbol):
     """comma_list : expression
                   | comma_list COMMA expression"""
@@ -114,10 +111,10 @@ def p_statement_comma_list(symbol):
     else:
         symbol[0] = symbol[1] + [symbol[3]]
 
-############################     CONDITIONAL      #############################
+############################     CONDICIONALES      #############################
 
 
-# The if statement, it may or may not have an 'else'
+# Declaracion 'IF', puedo o no haber 'ELSE"
 def p_statement_if(symbol):
     """statement :  IF OPENPAREN expression CLOSEPAREN  statement ELSE statement
                   |   IF OPENPAREN expression CLOSEPAREN  statement  """
@@ -126,113 +123,111 @@ def p_statement_if(symbol):
     else:
         symbol[0] = If(symbol[3], symbol[5], symbol[7])
 
-# def p_statment_2(symbol):
-#      """statement2 : statement ELSE statement
-#                   |  statement """
 
-###############################     LOOP      #################################
+###############################     LAZOS      #################################
 
 
-# The for statement, automatically declares an 'int' variable in the scope of
-# the for, this variable has a value of every value in the range specified
+# Declaracion for, la variable recorre el conjunto en la direccion indicada
 def p_statement_for(symbol):
     """statement : FOR ID MAX expression DO statement
                  | FOR ID MIN expression DO statement"""
     symbol[0] = For(Variable(symbol[2]), symbol[4], symbol[6], symbol[3])
 
 
-# The while statement, while some condition holds, keep doing a statement
+# Declaracion while-do, despues de pasar el chequeo de guarda,
+# se realizan las expresiones en el bloque
 def p_statement_while(symbol):
     "statement : WHILE OPENPAREN expression CLOSEPAREN DO statement"
     symbol[0] = While(symbol[3], symbol[6])
 
-# The while statement, while some condition holds, keep doing a statement
+# Declaracion repeat-while, realiza las instruciones en el bloque,
+# luego evalua la expresion en el while, si se cumple vuelve al bloque
 def p_statement_repeat(symbol):
     "statement : REPEAT statement WHILE OPENPAREN expression CLOSEPAREN "
     symbol[0] = Repeat(symbol[2], symbol[5])
 
 
-# The while statement, while some condition holds, keep doing a statement
+# Combinacion de ambos lazos
 def p_statement_repeat_while(symbol):
     "statement : REPEAT statement WHILE OPENPAREN expression CLOSEPAREN DO statement"
     symbol[0] = RepeatWhile(symbol[2], symbol[5], symbol[8])
 
 
 ###############################################################################
-#############################     EXPRESSIONS     #############################
+#############################     EXPRESIONES     #############################
 ###############################################################################
 
 
-# Precedence defined for expressions
+# Precedencia de los operadores
 precedence = (
-    # language
+    # lenguaje
     ("right", 'CLOSEPAREN'),
     ("right", 'ELSE'),
-    # bool
+    # booleano
     ("left", 'OR'),
     ("left", 'AND'),
     ("right", 'NOT'),
-    # ("left", 'EQUIVALENT', 'INEQUIVALENT'),
-    # compare
+
+    # comparador
     ("nonassoc", 'SETBELONG'),
     ("nonassoc", 'EQUAL', 'UNEQUAL'),
     ("nonassoc", 'LESS', 'LESSEQ', 'GREAT', 'GREATEQ'),
-    # set 
+    # conjunto 
     ("left", 'SETUNION','SETDIFFERENCE'),
     ("left",'SETINTERSECTION'),
     ("right",'SETMAX','SETMIN','SETLEN'),
-    # int over set
+    # int sobre conjunto
     ("left", 'SETPLUS','SETMINUS'),
     ("left", 'SETTIMES','SETDIVITION','SETMOD'),
     # int
     ("left", 'PLUS', 'MINUS'),
     ("left", 'TIMES', 'DIVIDE', 'MODULE'), 
-    ("right", 'UMINUS'),#revisar '-' para declarar un negativo
+    ("right", 'UMINUS'),
 )
 
-##############################     LITERALS     ###############################
+##############################     TIPOS     ###############################
 
 
-# A number is a valid expression
+# Numeros
 def p_exp_int_literal(symbol):
     "expression : NUMBER"
     symbol[0] = Int(symbol[1])
 
 
-# A boolean is a valid expression
+# Booleanos
 def p_exp_bool_literal(symbol):
     """expression : TRUE
                   | FALSE"""
     symbol[0] = Bool(symbol[1].upper())
 
 
-# A range is a valid expression
+# Conjuntos
 def p_exp_set_literal(symbol):
     "expression : OPENCURLY comma_list CLOSECURLY"
     symbol[0] = Set(symbol[2])
 
 
-# A string is a valid expression
+# Cadena de caracteres
 def p_exp_string_literal(symbol):
     "expression : STRING"
     symbol[0] = String(symbol[1])
 
 
-# An ID is a variable expression, since an ID is an int, bool or range
+# Variables
 def p_expression_id(symbol):
     "expression : ID"
     symbol[0] = Variable(symbol[1])
 
 
-# An expression between parenthesis is still an expression
+# Expresiones entre parentesis
 def p_expression_group(symbol):
     """expression : OPENPAREN expression CLOSEPAREN"""
     symbol[0] = symbol[2]
 
-#############################     OPERATORS     ###############################
+#############################    OPERADORES     ###############################
 
 
-# Binary operators defined for int
+# Operadores bianrios de enteros
 def p_exp_int_binary(symbol):
     """expression : expression PLUS   expression
                   | expression MINUS  expression
@@ -249,13 +244,13 @@ def p_exp_int_binary(symbol):
     symbol[0] = Binary(operator, symbol[1], symbol[3])
 
 
-# Unary minus, defined for int
+# Menos unario para enteros
 def p_exp_int_unary(symbol):
-    "expression : MINUS expression %prec UMINUS"  #REVISAR ESE %prec
+    "expression : MINUS expression %prec UMINUS" 
     symbol[0] = Unary('MINUS', symbol[2])
 
 
-# Binary operators defined for set
+# Operadores binarios de conjuntos sobre conjuntos
 def p_exp_set_binary(symbol):
     """expression : expression SETUNION expression
                   | expression SETINTERSECTION expression 
@@ -265,10 +260,10 @@ def p_exp_set_binary(symbol):
         '><': 'SETINTERSECTION',
         '\\': 'SETDIFFERENCE'
     }[symbol[2]]
-    symbol[0] = Binary(operator, symbol[1], symbol[3])  #REVISAR: no estoy seguro de esta parte
+    symbol[0] = Binary(operator, symbol[1], symbol[3])  
 
 
-# Considered these functions as unary operators for range
+# Operadores unarios de conjuntos
 def p_exp_set_unary(symbol):
     """expression : SETMAX   expression 
                   | SETMIN   expression 
@@ -281,7 +276,7 @@ def p_exp_set_unary(symbol):
 
     symbol[0] = Unary(operator, symbol[2])  #REVISAR: parentesis LPAREN y RPAREN
 
-# Binary operators defined for int
+# Operadores binarios de conjuntos sobre enteros
 def p_exp_int_set_binary(symbol):
     """expression : expression SETPLUS   expression
                   | expression SETMINUS  expression
@@ -298,7 +293,7 @@ def p_exp_int_set_binary(symbol):
     symbol[0] = Binary(operator, symbol[1], symbol[3])
 
 
-# Binary operators defined for bool
+# Operadores binarios sobre booleanos
 def p_exp_bool_binary(symbol):
     """expression : expression OR      expression
                   | expression AND     expression"""
@@ -309,7 +304,7 @@ def p_exp_bool_binary(symbol):
     symbol[0] = Binary(operator, symbol[1], symbol[3])
 
 
-# Unary not, defined for bool
+# NOT unario para booleanos
 def p_exp_bool_unary(symbol):
     "expression : NOT expression"
     if isinstance(symbol[2], Bool):
@@ -320,7 +315,7 @@ def p_exp_bool_unary(symbol):
         symbol[0] = Unary(symbol[1].upper(), symbol[2])
 
 
-# Binary operators to compare
+# Operadores binarios de comparacion
 def p_exp_bool_compare(symbol):
     """expression : expression LESS    expression
                   | expression LESSEQ  expression
@@ -339,13 +334,13 @@ def p_exp_bool_compare(symbol):
     symbol[0] = Binary(operator, symbol[1], symbol[3])
 
 
-# Binary oprator defined for an int and a range
+# Operador binario de entero en conjunto
 def p_exp_bool_int_range(symbol):
     "expression : expression SETBELONG expression"
     symbol[0] = Binary('SETBELONG', symbol[1], symbol[3])
 
 
-# Error to be shown if the parser finds a Syntax error
+# Error a imprimir si el parser encuentra un error
 def p_error(symbol):
     if symbol:
         text = symbol.lexer.lexdata
@@ -357,13 +352,12 @@ def p_error(symbol):
         parser_error.append("ERROR: Syntax error at EOF")
 
 
-# Build the parser
+# Generar el parser
 parser = yacc.yacc(start='program')
 parser_error = []
 
 
-# The file (stored in a Python String) goes through the
-# parser and returns an AST that represents the program
+# EL archivo pasa por el parser, y es devuelto como el AST
 def parsing(data, debug=0):
     parser.error = 0
     ast = parser.parse(data, debug=debug)
@@ -374,7 +368,7 @@ def parsing(data, debug=0):
 ###############################################################################
 
 
-# Only to be called if this is the main module
+
 def main(argv=None):
     import sys      # argv, exit
 
@@ -412,6 +406,6 @@ def main(argv=None):
     return ast
 
 
-# If this is the module running
+
 if __name__ == "__main__":
     main()
