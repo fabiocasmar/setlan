@@ -75,20 +75,17 @@ tokens = [
 
     # EXPRESIONES/OPERADORES
         # OPERADORES DE CONJUNTOS
-            # ENTERO SOBRE CONJUNTOS
-                'SETPLUS',
-                'SETMINUS',
-                'SETTIMES',
-                'SETMOD',
-                'SETDIVITION',
-            # UNARIOS
-                'SETMAX',
-                'SETMIN',
-                'SETLEN',
-            # CONJUNTO SOBRE CONJUNTO
-                'SETINTERSECTION',
-                'SETUNION',
-                'SETDIFFERENCE',
+            'SETPLUS',
+            'SETMINUS',
+            'SETTIMES',
+            'SETMOD',
+            'SETDIVITION',
+            'SETMAX',
+            'SETMIN',
+            'SETLEN',
+            'SETINTERSECTION',
+            'SETUNION',
+            'SETDIFFERENCE',
         # OPERADORES DE Enteros
             'PLUS',
             'MINUS',

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-####
-#CI3725 - Etapa 1 - Análisis Lexicográfico
-#Fabio, Castro, 10-10132
-#Antonio, Scaramazza 11-10957
-####
+"""Lexer para el lenguaje Setlan
+Fabio, Castro 10-10132
+Antonio, Scaramazza 11-10957
+"""
+
 import ply.lex as lex
 
 # Palabras reservadas del lenguaje
@@ -75,20 +75,17 @@ tokens = [
 
     # EXPRESIONES/OPERADORES
         # OPERADORES DE CONJUNTOS
-            # ENTERO SOBRE CONJUNTOS
-                'SETPLUS',
-                'SETMINUS',
-                'SETTIMES',
-                'SETMOD',
-                'SETDIVITION',
-            # UNARIOS
-                'SETMAX',
-                'SETMIN',
-                'SETLEN',
-            # CONJUNTO SOBRE CONJUNTO
-                'SETINTERSECTION',
-                'SETUNION',
-                'SETDIFFERENCE',
+            'SETPLUS',
+            'SETMINUS',
+            'SETTIMES',
+            'SETMOD',
+            'SETDIVITION',
+            'SETMAX',
+            'SETMIN',
+            'SETLEN',
+            'SETINTERSECTION',
+            'SETUNION',
+            'SETDIFFERENCE',
         # OPERADORES DE Enteros
             'PLUS',
             'MINUS',
