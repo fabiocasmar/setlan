@@ -146,7 +146,7 @@ def p_statement_scan(symbol):
     variable = Variable(span(symbol, 2), symbol[2])
     start, _ = span(symbol, 1)
     _, end = span(symbol, 2)
-    symbol[0] = Read((start, end), variable)
+    symbol[0] = Scan((start, end), variable)
 
 
 # Comando 'print', muestra por pantalla las expresiones dadas
@@ -322,95 +322,83 @@ def p_expression_group(symbol):
 
 
 # Operadores bianrios de enteros
-def p_exp_int_binary(symbol):
+def p_exp_binary(symbol):
     """expression : expression PLUS   expression
                   | expression MINUS  expression
                   | expression TIMES  expression
                   | expression DIVIDE expression
-                  | expression MODULE expression"""
+                  | expression MODULE expression
+                  | expression SETUNION expression
+                  | expression SETINTERSECTION expression
+                  | expression SETDIFFERENCE expression 
+                  | expression SETPLUS   expression
+                  | expression SETMINUS  expression
+                  | expression SETTIMES  expression
+                  | expression SETDIVITION expression
+                  | expression SETMOD expression
+                  | expression OR           expression
+                  | expression AND          expression
+                  | expression SETBELONG       expression"""
     operator = {
         '+': 'PLUS',
         '-': 'MINUS',
         '*': 'TIMES',
         '/': 'DIVIDE',
-        '%': 'MODULE'
-    }[symbol[2]]
-    symbol[0] = Binary(operator, symbol[1], symbol[3])
-
-
-# Menos unario para enteros
-def p_exp_int_unary(symbol):
-    "expression : MINUS expression %prec UMINUS" 
-    symbol[0] = Unary('MINUS', symbol[2])
-
-
-# Operadores binarios de conjuntos sobre conjuntos
-def p_exp_set_binary(symbol):
-    """expression : expression SETUNION expression
-                  | expression SETINTERSECTION expression 
-                  | expression SETDIFFERENCE expression """
-    operator = {
+        '%': 'MODULE',
         '++': 'SETUNION',
         '><': 'SETINTERSECTION',
-        '\\': 'SETDIFFERENCE'
-    }[symbol[2]]
-    symbol[0] = Binary(operator, symbol[1], symbol[3])  
-
-
-# Operadores unarios de conjuntos
-def p_exp_set_unary(symbol):
-    """expression : SETMAX   expression 
-                  | SETMIN   expression 
-                  | SETLEN   expression """
-    operator = {
-        '>?': 'SETMAX',
-        '<?': 'SETMIN',
-        '$?': 'SETLEN'
-    }[symbol[1]]              
-
-    symbol[0] = Unary(operator, symbol[2]) 
-
-# Operadores binarios de conjuntos sobre enteros
-def p_exp_int_set_binary(symbol):
-    """expression : expression SETPLUS   expression
-                  | expression SETMINUS  expression
-                  | expression SETTIMES  expression
-                  | expression SETDIVITION expression
-                  | expression SETMOD expression"""
-    operator = {
+        '\\': 'SETDIFFERENCE',
         '<+>': 'SETPLUS',
         '<->': 'SETMINUS',
         '<*>': 'SETTIMES',
         '</>': 'SETDIVITION',
         '<%>': 'SETMOD',
-    }[symbol[2]]
-    symbol[0] = Binary(operator, symbol[1], symbol[3])
-
-
-# Operadores binarios sobre booleanos
-def p_exp_bool_binary(symbol):
-    """expression : expression OR      expression
-                  | expression AND     expression"""
-    operator = {
         'or': 'OR',
         'and': 'AND',
-    }[symbol[2]]
-    symbol[0] = Binary(operator, symbol[1], symbol[3])
+        '@': 'SETBELONG'
+    }get(symbol[2], None)
+  
 
+    start, _ = span(symbol, 1)
+    _, end = span(symbol, 3)
 
-# NOT unario para booleanos
-def p_exp_bool_unary(symbol):
-    "expression : NOT expression"
-    if isinstance(symbol[2], Bool):
-        expr = eval(symbol[2].value.title())
-        expr = str(not expr).upper()
-        symbol[0] = Bool(expr)
+    if operator == 'PLUS':
+        symbol[0] = Plus((start, end), symbol[1], symbol[3])
+    elif operator == 'MINUS':
+        symbol[0] = Minus((start, end), symbol[1], symbol[3])
+    elif operator == 'TIMES':
+        symbol[0] = Times((start, end), symbol[1], symbol[3])
+    elif operator == 'DIVIDE':
+        symbol[0] = Divide((start, end), symbol[1], symbol[3])
+    elif operator == 'MODULE':
+        symbol[0] = Module((start, end), symbol[1], symbol[3])
+    elif operator == 'SETUNION':
+        symbol[0] = Setunion((start, end), symbol[1], symbol[3])
+    elif operator == 'SETINTERSECTION':
+        symbol[0] = Setintersection((start, end), symbol[1], symbol[3])
+    elif operator == 'SETDIFFERENCE':
+        symbol[0] = Setdifference((start, end), symbol[1], symbol[3])
+    elif operator == 'SETPLUS':
+        symbol[0] = Setplus((start, end), symbol[1], symbol[3])
+    elif operator == 'SETMINUS':
+        symbol[0] = Setminus((start, end), symbol[1], symbol[3])
+    elif operator == 'SETTIMES':
+        symbol[0] = Settimes((start, end), symbol[1], symbol[3])
+    elif operator == 'SETDIVITION':
+        symbol[0] = Setdivition((start, end), symbol[1], symbol[3])
+    elif operator == 'SETMOD':
+        symbol[0] = Setmmod((start, end), symbol[1], symbol[3])
+    elif operator == 'OR':
+        symbol[0] = Or((start, end), symbol[1], symbol[3])
+    elif operator == 'AND':
+        symbol[0] = And((start, end), symbol[1], symbol[3])
+    elif operator == 'SETBELONG':
+        symbol[0] = Setbelong((start, end), symbol[1], symbol[3])
     else:
-        symbol[0] = Unary(symbol[1].upper(), symbol[2])
-
+        symbol[0] = Binary((start, end), operator, symbol[1], symbol[3])
 
 # Operadores binarios de comparacion
-def p_exp_bool_compare(symbol):
+def p_exp_compare(symbol):
     """expression : expression LESS    expression
                   | expression LESSEQ  expression
                   | expression GREAT   expression
@@ -424,14 +412,72 @@ def p_exp_bool_compare(symbol):
         '>=': 'GREATEQ',
         '==': 'EQUAL',
         '/=': 'UNEQUAL'
-    }[symbol[2]]
-    symbol[0] = Binary(operator, symbol[1], symbol[3])
+    }.get(symbol[2], None)
+
+    start, _ = span(symbol, 1)
+    _, end = span(symbol, 2)
+
+    if operator == 'LESS':
+        symbol[0] = Less((start, end), symbol[1], symbol[3])
+    elif operator == 'LESSEQ':
+        symbol[0] = LessEq((start, end), symbol[1], symbol[3])
+    elif operator == 'GREAT':
+        symbol[0] = Great((start, end), symbol[1], symbol[3])
+    elif operator == 'GREATEQ':
+        symbol[0] = GreatEq((start, end), symbol[1], symbol[3])
+    elif operator == 'EQUAL':
+        symbol[0] = Equal((start, end), symbol[1], symbol[3])
+    elif operator == 'UNEQUAL':
+        symbol[0] = Unequal((start, end), symbol[1], symbol[3])
+    else:
+        symbol[0] = Binary((start, end), operator, symbol[1], symbol[3])
 
 
-# Operador binario de entero en conjunto
-def p_exp_bool_int_set(symbol):
-    "expression : expression SETBELONG expression"
-    symbol[0] = Binary('SETBELONG', symbol[1], symbol[3])
+# Menos unario para enteros
+def p_exp_int_unary(symbol):
+    """expression : MINUS expression %prec UMINUS
+                  | NOT expression"""
+    operator = {
+        '-': 'MINUS',
+        'not': 'NOT'
+    }.get(symbol[1], None)
+
+    start, _ = span(symbol, 1)
+    _, end = span(symbol, 2)
+
+    if operator == 'MINUS':
+        symbol[0] = UMinus((start, end), symbol[2])
+    elif operator == 'NOT':
+        symbol[0] = Not((start, end), symbol[2])
+    else:
+        symbol[0] = Unary((start, end), operator, symbol[2])
+
+
+# Operadores unarios de conjuntos
+def p_exp_set_unary(symbol):
+    """expression : SETMAX   expression 
+                  | SETMIN   expression 
+                  | SETLEN   expression """
+    operator = {
+        '>?': 'SETMAX',
+        '<?': 'SETMIN',
+        '$?': 'SETLEN'
+    }[symbol[1]].upper()              
+
+    start, _ = span(symbol, 1)
+    _, end = span(symbol, 2)
+    symbol[0] = Unary(operator, symbol[2])          
+
+    if operator == 'SETMAX':
+        symbol[0] = Setmax((start, end), symbol[3])
+    elif operator == 'SETMIN':
+        symbol[0] = Setmin((start, end), symbol[3])
+    elif operator == 'Setlen':
+        symbol[0] = Setlen((start, end), symbol[3])
+    else:
+        symbol[0] = Unary((start, end), operator, symbol[3])
+
+
 
 
 # Error a imprimir si el parser encuentra un error
@@ -457,6 +503,8 @@ def parsing(data, debug=0):
     ast = parser.parse(data, debug=debug)
     if parser.error:
         ast = None
+    if ast:
+        ast.check()
     return ast
 
 ###############################################################################
