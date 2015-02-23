@@ -17,7 +17,7 @@ def span(symbol, pos):
     if isinstance(symbol[pos], (int, str)):
         lexspan = symbol.lexspan(pos)
         linespan = symbol.linespan(pos)
-
+        print lexspan[0]
         startpos = linespan[0], find_column(lexer.lexdata, lexspan[0])
         endpos = linespan[1], find_column(symbol.lexer.lexdata, lexspan[1])
     elif isinstance(symbol[pos], list):
@@ -172,15 +172,15 @@ def p_statement_comma_list(symbol):
         symbol[0] = symbol[1] + [symbol[3]]
 
 # # A string is a valid printable
-# def p_print_string_literal(symbol):
-#     """printable : STRING"""
-#     symbol[0] = String(span(symbol, 1), symbol[1])
+#def p_print_string_literal(symbol):
+#    """printable : STRING"""
+#    symbol[0] = String(span(symbol, 1), symbol[1])
 # REVISAR
 
-# # An expression is a valid printable
-# def p_exp_print(symbol):
-#     """printable : expression"""
-#     symbol[0] = symbol[1]
+# An expression is a valid printable
+#def p_exp_print(symbol):
+#    """printable : expression"""
+#    symbol[0] = symbol[1]
 # REVISAR
 
 ############################     CONDICIONALES      #############################

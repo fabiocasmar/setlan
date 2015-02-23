@@ -1,3 +1,6 @@
 program { 
-	x = x+1;
+	using 
+		int x;
+	in
+	x=x+1
 }

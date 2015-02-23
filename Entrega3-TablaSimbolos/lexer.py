@@ -9,7 +9,7 @@
 import ply.lex as lex
 
 # Palabras reservadas del lenguaje
-reserved = {
+RESERVED = {
     # lenguaje
     'program' : 'PROGRAM',
 
@@ -75,20 +75,17 @@ tokens = [
 
     # EXPRESIONES/OPERADORES
         # OPERADORES DE CONJUNTOS
-            # ENTERO SOBRE CONJUNTOS
-                'SETPLUS',
-                'SETMINUS',
-                'SETTIMES',
-                'SETMOD',
-                'SETDIVITION',
-            # UNARIOS
-                'SETMAX',
-                'SETMIN',
-                'SETLEN',
-            # CONJUNTO SOBRE CONJUNTO
-                'SETINTERSECTION',
-                'SETUNION',
-                'SETDIFFERENCE',
+            'SETPLUS',
+            'SETMINUS',
+            'SETTIMES',
+            'SETMOD',
+            'SETDIVITION',
+            'SETMAX',
+            'SETMIN',
+            'SETLEN',
+            'SETINTERSECTION',
+            'SETUNION',
+            'SETDIFFERENCE',
         # OPERADORES DE Enteros
             'PLUS',
             'MINUS',
@@ -109,70 +106,144 @@ tokens = [
            'CLOSEPAREN',
            'OPENCURLY',
            'CLOSECURLY'
-] + list(reserved.values())
+] + list(RESERVED.values())
 
 
-
-def t_NUMBER(token):
-    r'\d+'
-    val = int(token.value)
-    if val > 2147483648:
-        error_NUMBER(token)
-    token.value = val
-    return token
-
-t_COMMA = r','
-t_SEMICOLON = r';'
-t_ASSIGN = r'='
-
-def t_ID(t):
-    r'\w[\w\d]*'
-    # Si no existen palabras reservadas que concuender, entonces es un Identificador
-    t.type = reserved.get(t.value, 'ID')
-    return t
-
-
-# Los Strings almacenan toda entrada sin importar los saltos de linea
-# Siempre que estas esten entre " "
-
-t_STRING = r'\"([^\\\n]|(\\(n|"|\\)))*?\"'
-
-# token de conjuntos
-t_SETPLUS = r'\<\+\>'
-t_SETMINUS = r'\<\-\>'
-t_SETTIMES = r'\<\*\>'
-t_SETDIVITION = r'\<\/\>'
-t_SETMOD = r'\<\%\>'
-t_SETMAX = r'\>\?'
-t_SETMIN = r'\<\?'
-t_SETLEN = r'\$\?'
-t_SETINTERSECTION = r'\>\<'
-t_SETUNION = r'\+\+'
-t_SETDIFFERENCE = r'\\'
-
-# token de entero
+# Token de Entero
 t_PLUS = r'\+'
 t_MINUS = r'-'
 t_TIMES = r'\*'
 t_DIVIDE = r'/'
 t_MODULE = r'%'
 
-# token de booleano
+# Token de Set
+
 t_LESS = r'\<'
-t_LESSEQ = r'\<\='
 t_GREAT = r'\>'
-t_GREATEQ = r'\>\='
-t_EQUAL = r'\=\='
-t_UNEQUAL = r'\/\='
 
-#token de booleano sobre entero
-t_SETBELONG = r'\@'
+# Token de Separacion
 
-# parentizacion
+t_COMMA = r','
+t_SEMICOLON = r';'
+
+# Token de Asignacion
+t_ASSIGN = r'='
+
+# Token de Parentizacion
 t_OPENPAREN = r'\('
 t_CLOSEPAREN = r'\)'
 t_OPENCURLY = r'\{'
 t_CLOSECURLY = r'\}'
+
+def t_NUMBER(token):
+    r'\d+'
+    val = int(token.value)
+    if val > 2147483648:
+        error_NUMBER(token)
+
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    token.value = val
+    return token
+
+def t_ID(token):
+    r'\w[\w\d]*'
+    # If there are no reserved words that match, it's an ID
+    token.type = RESERVED.get(token.value, 'ID')
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token
+
+# Los Strings almacenan toda entrada sin importar los saltos de linea
+# Siempre que estas esten entre " "
+
+def t_STRING(token):
+    r'\"([^\\\n]|(\\(n|"|\\)))*?\"'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token
+
+# token de conjuntos
+def t_SETPLUS(token): 
+    r'\<\+\>'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETMINUS(token):
+    r'\<\-\>'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETTIMES(token):
+    r'\<\*\>'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETDIVITION(token):
+    r'\<\/\>'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETMOD(token):
+    r'\<\%\>'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETMAX(token):
+    r'\>\?'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETMIN(token):
+    r'\<\?'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETLEN(token):
+    r'\$\?'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETINTERSECTION(token):
+    r'\>\<'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETUNION(token):
+    r'\+\+'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_SETDIFFERENCE(token):
+    r'\\'
+    token.endlexpos = token.lexpos + 1
+    return token
+
+# token de booleano
+
+def t_LESSEQ(token):
+    r'\<\='
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_GREATEQ(token):
+    r'\>\='
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_EQUAL(token):
+    r'\=\='
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_UNEQUAL(token):
+    r'\/\='
+    token.endlexpos = token.lexpos + 1
+    return token
+
+
+#token de booleano sobre entero
+def t_SETBELONG(token):
+    r'\@'
+    token.endlexpos = token.lexpos + 1
+    return token
 
 # Ignora espacion, tabuladores y comentarios en formato C
 t_ignore = " \t"
@@ -213,7 +284,6 @@ def error_NUMBER(token):
     data = (token.value, token.lineno, find_column(text, token))
     lexer_error.append(message % data)
 
-# Build the lexer
 # Build the lexer
 lexer = lex.lex()
 lexer_error = []
