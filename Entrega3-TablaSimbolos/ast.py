@@ -105,16 +105,25 @@ class Assign(Statement):
 
 class Block(Statement):
     """Declaracion de bloque"""
-    def __init__(self, statements):
+    def __init__(self, lexspan, statements, scope=SymTable()):
+        # self.type = "block"
+        self.lexspan = lexspan
         self.statements = statements
+        self.scope = scope
 
     def print_tree(self, level):
-        string = indent(level) + "BLOCK\n"
+        string = indent(level) + "BEGIN\n"
+
+        if self.scope:
+            string += self.scope.print_tree(level) + '\n'
+        string += indent(level) + "STATEMENTS\n"
+
         for stat in self.statements:
             string += stat.print_tree(level + 1) + '\n'
             string += indent(level + 1) + "SEPARATOR\n"
-        #string = string[:(-10 - len(indent(1)))]
-        string += indent(level) + "BLOCK_END"
+        string = string[:(-10 - len(indent(1)))]
+        string += "END"
+
         return string
 
     def check(self):
@@ -350,7 +359,9 @@ class Variable(Expression):
 
 class Int(Expression):
     """Clase a definir un entero"""
-    def __init__(self, value):
+    def __init__(self, lexspan, value):
+        # self.type = "int"
+        self.lexspan = lexspan
         self.value = value
 
     def __str__(self):

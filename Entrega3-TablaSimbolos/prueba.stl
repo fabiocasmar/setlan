@@ -2,5 +2,5 @@ program {
 	using 
 		int x;
 	in
-	x=x+1
+	x=x+1;
 }

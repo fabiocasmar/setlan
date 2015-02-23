@@ -17,7 +17,6 @@ def span(symbol, pos):
     if isinstance(symbol[pos], (int, str)):
         lexspan = symbol.lexspan(pos)
         linespan = symbol.linespan(pos)
-        print lexspan[0]
         startpos = linespan[0], find_column(lexer.lexdata, lexspan[0])
         endpos = linespan[1], find_column(symbol.lexer.lexdata, lexspan[1])
     elif isinstance(symbol[pos], list):

@@ -132,8 +132,16 @@ t_ASSIGN = r'='
 # Token de Parentizacion
 t_OPENPAREN = r'\('
 t_CLOSEPAREN = r'\)'
-t_OPENCURLY = r'\{'
-t_CLOSECURLY = r'\}'
+
+def t_OPENCURLY(token):
+    r'\{'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token
+
+def t_CLOSECURLY(token):
+    r'\}'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token
 
 def t_NUMBER(token):
     r'\d+'
@@ -249,39 +257,35 @@ def t_SETBELONG(token):
 t_ignore = " \t"
 t_ignore_COMMENT = r'\#.*'
 
-# El unico caracter de salto de linea a conciderar es "\n"
-def t_newline(t):
+# The only new line character considered is \n
+def t_newline(token):
     r'\n+'
-    t.lexer.lineno += t.value.count('\n')
+    token.lexer.lineno += token.value.count('\n')
 
-# Determinar el numero de columna en la linea actual
-def find_column(text,token):
-    last_cr = text.rfind('\n',0,token.lexpos)
-    if last_cr < 0:
-        last_cr = -1
-    column = token.lexpos - last_cr
+
+# To find the column number of the current line
+def find_column(text, lexpos):
+    last_new = text.rfind('\n', 0, lexpos)
+    if last_new < 0:
+        last_new = -1
+    column = lexpos - last_new
     return column
 
-# Error a mostrar en caso de encontrar un caracter inseperado
+
+# Error to be shown if the lexer finds an "Unexpected" character
 def t_error(token):
     text = token.lexer.lexdata
-    message = "Error: Se encontró un caracter inesperado '%s' en la línea %d, columna %d"    r'\d+'
-    val = int(token.value)
-    if val > 2147483648:
-        error_NUMBER(token)
-
-    token.value = val
-    return token
-    data = (token.value[0], token.lineno, find_column(text, token))
+    message = "ERROR: unexpected character '%s' at line %d, column %d"
+    data = token.value[0], token.lineno, find_column(text, token.lexer.lexpos)
     lexer_error.append(message % data)
     token.lexer.skip(1)
 
 
-# Error a mostrar número, número muy grande
+# Error to be shown if the lexer finds a number that's too large
 def error_NUMBER(token):
     text = token.lexer.lexdata
-    message = "Error: Overflow for int '%s' at line %d, column %d"
-    data = (token.value, token.lineno, find_column(text, token))
+    message = "ERROR: overflow for int '%s' at line %d, column %d"
+    data = token.value, token.lineno, find_column(text, token.lexer.lexpos)
     lexer_error.append(message % data)
 
 # Build the lexer
