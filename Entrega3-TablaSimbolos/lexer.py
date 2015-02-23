@@ -214,7 +214,8 @@ def error_NUMBER(token):
     lexer_error.append(message % data)
 
 # Build the lexer
-lex.lex()
+# Build the lexer
+lexer = lex.lex()
 lexer_error = []
 
 ###############################################################################

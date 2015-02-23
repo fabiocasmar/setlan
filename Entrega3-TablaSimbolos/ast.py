@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/isr/bin/env python
 # -*- coding: utf-8 -*-
 
 ####
@@ -176,7 +176,7 @@ class Print(Statement):
         return boolean
 
 
-class PrintLn(Write):
+class PrintLn(Print):
     """Writeln statement, Write with a new line at the end"""
     def __init__(self, lexspan, elements):
         Print.__init__(self, lexspan, elements)
@@ -408,7 +408,7 @@ class String(Expression):
     def print_tree(self, level):
         return indent(level) + "STRING: " + str(self.value)
 
-   def check(self):
+    def check(self):
         return 'STRING'
 
 
@@ -687,17 +687,6 @@ class And(Binary):
         type_tuples = [('BOOL', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
-class Not(Unary):
-    """Unary expressions with a 'not'"""
-    def __init__(self, lexspan, operand):
-        # self.type = "not"
-        Unary.__init__(self, lexspan, "not", operand)
-
-    def check(self):
-        set_scope(self.operand, self.scope)
-        operand = self.operand.check()
-        types = [('BOOL',)]
-        return check_unary(self.lexspan, self.operator, operand, types)
 
 class Less(Binary):
     """Binary expressions with a '<'"""
@@ -893,4 +882,16 @@ class SetLen(Unary):
         set_scope(self.operand, self.scope)
         operand = self.operand.check()
         types = [('SET',)]
+        return check_unary(self.lexspan, self.operator, operand, types)
+
+class Not(Unary):
+    """Unary expressions with a 'not'"""
+    def __init__(self, lexspan, operand):
+        # self.type = "not"
+        Unary.__init__(self, lexspan, "not", operand)
+
+    def check(self):
+        set_scope(self.operand, self.scope)
+        operand = self.operand.check()
+        types = [('BOOL',)]
         return check_unary(self.lexspan, self.operator, operand, types)

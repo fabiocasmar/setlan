@@ -7,7 +7,7 @@ Antonio, Scaramazza 11-10957
 """
 
 import ply.yacc as yacc
-from lexer import tokens, lexer_error, find_column
+from lexer import tokens, lexer_error, find_column, lexer
 from ast import *
 
 
@@ -356,7 +356,7 @@ def p_exp_binary(symbol):
         'or': 'OR',
         'and': 'AND',
         '@': 'SETBELONG'
-    }get(symbol[2], None)
+    }.get(symbol[2], None)
   
 
     start, _ = span(symbol, 1)
