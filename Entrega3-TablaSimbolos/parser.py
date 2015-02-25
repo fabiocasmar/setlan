@@ -287,20 +287,24 @@ def p_exp_bool_literal(symbol):
                   | FALSE"""
     symbol[0] = Bool(span(symbol, 1), symbol[1].upper())
 
-
 # Conjuntos
 def p_exp_set_literal(symbol):
-    "expression : OPENCURLY comma_list CLOSECURLY"
+    """expression : OPENCURLY comma_list CLOSECURLY
+                  | OPENCURLY CLOSECURLY """
     # symbol[0] = Set(symbol[2])
-    start, _ = span(symbol, 1)
-    _, end = span(symbol, 3)
-    symbol[0] = Set((start, end), symbol[2])
-
+    if len(symbol) == 4:
+        start, _ = span(symbol, 1)
+        _, end = span(symbol, 3)
+        symbol[0] = Set((start, end), symbol[2])
+    else:
+        start, _ = span(symbol, 1)
+        _, end = span(symbol, 2)
+        symbol[0] = Set((start, end), None)
 
 # Cadena de caracteres
 def p_exp_string_literal(symbol):
     "expression : STRING"
-    symbol[0] = String(symbol[1])
+    symbol[0] = String(span(symbol, 1),symbol[1])
 
 
 # Variables

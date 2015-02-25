@@ -11,9 +11,9 @@ program {
     y = {a, b, b + a, b - a, b * a, b / a, b % a};
 
     # esto se asocia: (a <+> y) ++ (b <+> x) ++ y ++ x
-    for i max a <+> y ++ b <+> x ++ y ++ x do
-        print i, ", "
-    ;
+#    for i max a <+> y ++ b <+> x ++ y ++ x do
+#        print i, ", "
+#    ;
 
     print "done.";
 }

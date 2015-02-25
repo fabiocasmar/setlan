@@ -33,7 +33,7 @@ class Program:
         return "PROGRAM\n" + self.statement.print_tree(1)
 
     def print_symtab(self):
-        return str(self.statement.print_symtab(1))
+        return "SymTable: \n"+str(self.statement.print_symtab(1))
 
     def check(self):
         set_scope(self.statement, self.scope)
@@ -83,17 +83,6 @@ class Assign(Statement):
         var_type = self.variable.check()
         exp_type = self.expression.check()
 
-        if var_type is not None:
-            var_info = self.scope.find(self.variable)
-            if var_info.protected:
-                message = "ERROR: modifying at line %d, column %d "
-                message += "value of variable '%s' that belongs to "
-                message += "a for statement at line %d, column %d"
-                var_lin, var_col = self.variable.lexspan[0]
-                for_slin, for_scol = var_info.lexspan[0]
-                data = var_lin, var_col, var_info.name, for_slin, for_scol
-                static_error.append(message % data)
-
         if var_type is None or exp_type is None:
             return False
 
@@ -134,15 +123,13 @@ class Block(Statement):
         return string
 
     def print_symtab(self, level):
-        level = level -1
-        string = indent(level) + "Symbol Table:\n"
-
         if self.scope:
-            string += self.scope.print_symtab(level) + '\n'
-
+            string = indent(level-1) + "SCOPE\n"
+            string += self.scope.print_symtab(level) 
         for stat in self.statements:
-            string += stat.print_symtab(level) + '\n'
-            string += indent(level)
+            string += stat.print_symtab(level+2) 
+        if self.scope:
+            string += indent(level-1) + "END_SCOPE\n"
         #string = string[:(-10 - len(indent(1)))]
         return string       
 
@@ -167,7 +154,7 @@ class Scan(Statement):
         return string
 
     def print_symtab(self, level):
-        return string
+        return ""
 
     def check(self):
         set_scope(self.variable, self.scope)
@@ -198,7 +185,7 @@ class Print(Statement):
         return string[:-1]
 
     def print_symtab(self, level):
-        return string
+        return ""
 
     def check(self):
         boolean = True
@@ -214,7 +201,7 @@ class PrintLn(Print):
     def __init__(self, lexspan, elements):
         Print.__init__(self, lexspan, elements)
         # self.type = "writeln"
-        return boolean
+
 
 class If(Statement):
     """If statement"""
@@ -238,7 +225,7 @@ class If(Statement):
         return string
 
     def print_symtab(self, level):
-        string += self.then_st.print_symtab(level)
+        string = self.then_st.print_symtab(level)
         if self.else_st:
             string += self.else_st.print_symtab(level)
         return string
@@ -285,14 +272,13 @@ class For(Statement):
         return string
 
     def print_symtab(self, level):
-        string = ""
         #FALTA TERMINAR AQUI
         #  string += indent(level + 1) + "variable: " + str(self.variable) + '\n'
         #  string += indent(level + 1) + str(self.dire) + ":\n"
         #  string += self.in_set.print_tree(level + 2) + '\n'
         #  string += indent(level + 1) + "DO statement:\n"
         #  string += self.statement.print_tree(level + 2)
-        return string
+        return ""
 
 
 
@@ -346,13 +332,12 @@ class Repeat(Statement):
         return string
 
     def print_symtab(self, level):
-        string = ""
         #   string = indent(level) + "WHILE\n"
         #   string += indent(level + 1) + "DO statement:\n"
         #   string += self.statement.print_tree(level + 2)
         #   string += indent(level + 1) + "condition:\n"
         #   string += self.condition.print_tree(level + 2) + '\n'
-        return string
+        return ""
 
 class RepeatWhile(Statement):
     """Declaracion repeat-while, toma una expresion"""
@@ -471,18 +456,20 @@ class Bool(Expression):
 
 class Set(Expression):
     """Clase a definir un conjunto"""
-    def __init__(self, lexspan, from_value, to_value):
+    def __init__(self, lexspan, values):
         # self.type = "set"
         self.lexspan = lexspan
-        self.from_value = from_value
-        self.to_value = to_value
+        if values is not None:
+            self.values = values
+        else:
+            self.values = []
 
     def __str__(self):
-        return str(self.valores) + '..' + str(self.valores)
+        return str(self.values)
 
     def print_tree(self, level):
         string = indent(level) + "VALORES:\n" 
-        for i in self.valores:
+        for i in self.values:
             string+= i.print_tree(level+1)+ '\n'
         return string
 
@@ -490,9 +477,27 @@ class Set(Expression):
         string = ""
         return string
 
+    def check(self):
+        if self.values is not None:
+            for i in self.values:
+                set_scope(i, self.scope)
+                if i.check() != "INT":
+                    error_unsuported_set(self.lexspan,i.check())
+            return "SET"
+
+
+def error_unsuported_set(lexspan, type):
+    message = "ERROR: unsupported type '%s' for interior of set "
+    message += "from line %d, column %d"
+    s_lin, s_col = lexspan
+    data = str(operator), s_lin, s_col
+    static_error.append(message % data)
+
 class String(Expression):
     """Clase a definir una cadena de caracteres"""
-    def __init__(self, value):
+    def __init__(self, lexspan, value):
+        # self.type = "string"
+        self.lexspan = lexspan
         self.value = value
 
     def __str__(self):
@@ -622,7 +627,7 @@ class Divide(Binary):
         type_tuples = [('INT', 'INT')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
-class Modulo(Binary):
+class Module(Binary):
     """Binary expressions with a '%'"""
     def __init__(self, lexspan, left, right):
         # self.type = "%"
@@ -878,7 +883,7 @@ class Unequal(Binary):
 ######        Operadores Booleanos sobre Conjuntos     ######
 
 
-class SetBelong(Binary):
+class Setbelong(Binary):
     """Binary expressions with a '>>'"""
     def __init__(self, lexspan, left, right):
         # self.type = ">>"

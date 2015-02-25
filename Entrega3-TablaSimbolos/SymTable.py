@@ -34,17 +34,16 @@ class SymTable(object):
             return False
 
     def print_symtab(self, level):
-        string = indent(level) + "SCOPE\n"
+        string = ""
         for var in self.scope:
             sym = self.scope[var]
             string += indent(level+1) + str(sym) + '\n'
-        string += indent(level) + "END_SCOPE\n"
         return string
 
-    def insert(self, key, data_type, protected=False):
+    def insert(self, key, data_type):
         if not self.is_local(key):
             self.scope[key] = Symbol(key.lexspan, key.name,
-                                     data_type, protected)
+                                     data_type)
         else:
             print key.name + " already in scope"
 
@@ -97,21 +96,33 @@ class SymTable(object):
 
 class Symbol(object):
     """A Symbol of the Symbol Table"""
-    def __init__(self, lexspan, name, data_type, protected, value=None):
+    def __init__(self, lexspan, name, data_type, value=None):
         super(Symbol, self).__init__()
         self.lexspan = lexspan
         self.name = name
         self.data_type = data_type
-        self.protected = protected
-        self.value = value
+        if(data_type == "INT"):
+            self.value=0
+        if(data_type == "SET"):
+            self.value=[]
+        if(data_type == "BOOL"):
+            self.value = False
 
     def __str__(self):
-        if self.protected:
-            protected = ", protected"
-        else:
-            protected = ""
         if self.value:
             value = " = " + self.value
         else:
             value = ""
-        return "Variable: " + self.name + ' | Type: ' + str(self.data_type).lower() + " | Value:" + value 
+        if self.data_type != "SET":
+            return "Variable: " + self.name + ' | Type: ' + str(self.data_type).lower() + " | Value:" + str(self.value)
+        else:
+            string = "Variable: " + self.name + ' | Type: ' + str(self.data_type).lower() + " | Value:" + str("{") 
+            for i in self.value:
+                j+=1
+                if j > 1:
+                    string+=","
+                string += str(i) 
+
+            string +=str("}")
+            return string
+       

@@ -1,4 +1,9 @@
-program {}
+program {
+	using 
+		set i;
+	in
+	i = {};
+}
 
 #PROGRAM
 #    BLOCK
