@@ -6,8 +6,8 @@ program {
     print a, b + a;
 
     b = {1,2,3,4};
-
-    for i min >? b do {
+    a = >? b;
+    for i min b do {
         i = 10;
         print i;
         i = i + 1;

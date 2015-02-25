@@ -285,7 +285,7 @@ class For(Statement):
 
     def check(self):
         boolean = True
-        print self.in_set
+        set_scope(self.in_set, self.scope)
         if(self.in_set.check() != "SET"):
             message = "ERROR: unsupported type '%s' for scan "
             message += "from line %d, column %d"
