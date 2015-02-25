@@ -33,6 +33,13 @@ class SymTable(object):
         else:
             return False
 
+    def print_tree(self, level):
+        string = ""
+        for var in self.scope:
+            sym = self.scope[var]
+            string += indent(level+1) + sym.print_tree() + '\n'
+        return string
+
     def print_symtab(self, level):
         string = ""
         for var in self.scope:
@@ -107,6 +114,9 @@ class Symbol(object):
             self.value=[]
         if(data_type == "BOOL"):
             self.value = False
+
+    def print_tree(self):
+            return str(self.data_type).lower() + " " + self.name         
 
     def __str__(self):
         if self.value:

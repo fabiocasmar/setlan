@@ -212,7 +212,7 @@ def p_statement_for(symbol):
     variable = Variable(span(symbol, 2), symbol[2])
     start, _ = span(symbol, 1)
     _, end = span(symbol, 6)
-    symbol[0] = For((start, end), variable, symbol[4], symbol[6])
+    symbol[0] = For((start, end), variable,symbol[4], symbol[6], symbol[3])
 
 # Declaracion while-do, despues de pasar el chequeo de guarda,
 # se realizan las expresiones en el bloque
@@ -475,7 +475,7 @@ def p_exp_set_unary(symbol):
         symbol[0] = Setmax((start, end), symbol[3])
     elif operator == 'SETMIN':
         symbol[0] = Setmin((start, end), symbol[3])
-    elif operator == 'Setlen':
+    elif operator == 'SETLEN':
         symbol[0] = Setlen((start, end), symbol[3])
     else:
         symbol[0] = Unary((start, end), operator, symbol[3])

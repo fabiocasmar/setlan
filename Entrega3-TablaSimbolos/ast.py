@@ -110,9 +110,10 @@ class Block(Statement):
     def print_tree(self, level):
         string = indent(level) + "BEGIN\n"
 
-        #if self.scope:
-        #    string += self.scope.print_tree(level) + '\n'
-        #string += indent(level) + "STATEMENTS\n"
+        if self.scope:
+            string += indent(level) + "USING\n"
+            string += self.scope.print_tree(level) + '\n'
+            string += indent(level) + "IN\n"
 
         for stat in self.statements:
             string += stat.print_tree(level + 1) + '\n'
@@ -256,11 +257,13 @@ class If(Statement):
 
 class For(Statement):
     """Declaracion for, funciona sobre conjuntos"""
-    def __init__(self, variable, in_set, statement, dire):
+    def __init__(self, lexspan, variable, in_set, statement, dire,scope=SymTable()):
+        self.lexspan = lexspan
         self.variable = variable
         self.in_set = in_set
         self.statement = statement
         self.dire = dire
+        scope.insert(self.variable, 'INT')
 
     def print_tree(self, level):
         string = indent(level) + "FOR\n"
@@ -280,6 +283,12 @@ class For(Statement):
         #  string += self.statement.print_tree(level + 2)
         return ""
 
+    def check(self):
+        boolean = True
+        set_scope(self.statement, self.scope)
+        if self.statement.check() is False:
+            boolean = False
+        return True
 
 
 class While(Statement):
@@ -347,12 +356,12 @@ class RepeatWhile(Statement):
         self.statement2 = statement2
 
     def print_tree(self, level):
-        string = indent(level) + "WHILE\n"
-        string += indent(level + 1) + "DO statement:\n"
+        string = indent(level) + "REPEAT\n"
         string += self.statement.print_tree(level + 2)
+        string += indent(level + 1) + "WHILE \n"
         string += indent(level + 1) + "condition:\n"
         string += self.condition.print_tree(level + 2) + '\n'
-        string += indent(level + 1) + "DO statement2:\n"
+        string += indent(level + 1) + "DO:\n"
         string += self.statement2.print_tree(level + 2)
         return string
 
@@ -644,121 +653,121 @@ class Module(Binary):
 ######        Operadores sobre Conjuntos       ######
 
     ######       Entero sobre Conjuntos       ######
-    class SetPlus(Binary):
-        """Binary expressions with a '<+>'"""
-        def __init__(self, lexspan, left, right):
-            # self.type = "<->"
-            Binary.__init__(self, lexspan, "<+>", left, right)
+class Setplus(Binary):
+    """Binary expressions with a '<+>'"""
+    def __init__(self, lexspan, left, right):
+        # self.type = "<->"
+        Binary.__init__(self, lexspan, "<+>", left, right)
 
-        def check(self):
-            set_scope(self.left, self.scope)
-            set_scope(self.right, self.scope)
-            left = self.left.check()
-            right = self.right.check()
-            type_tuples = [('INT', 'SET')]
-            return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+    def check(self):
+        set_scope(self.left, self.scope)
+        set_scope(self.right, self.scope)
+        left = self.left.check()
+        right = self.right.check()
+        type_tuples = [('INT', 'SET')]
+        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
-    class SetMinus(Binary):
-        """Binary expressions with a '<->'"""
-        def __init__(self, lexspan, left, right):
-            # self.type = "<->"
-            Binary.__init__(self, lexspan, "<->", left, right)
+class Setminus(Binary):
+    """Binary expressions with a '<->'"""
+    def __init__(self, lexspan, left, right):
+        # self.type = "<->"
+        Binary.__init__(self, lexspan, "<->", left, right)
 
-        def check(self):
-            set_scope(self.left, self.scope)
-            set_scope(self.right, self.scope)
-            left = self.left.check()
-            right = self.right.check()
-            type_tuples = [('INT', 'SET')]
-            return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+    def check(self):
+        set_scope(self.left, self.scope)
+        set_scope(self.right, self.scope)
+        left = self.left.check()
+        right = self.right.check()
+        type_tuples = [('INT', 'SET')]
+        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
-    class SetTimes(Binary):
-        """Binary expressions with a '<*>'"""
-        def __init__(self, lexspan, left, right):
-            # self.type = "<*>"
-            Binary.__init__(self, lexspan, "<*>", left, right)
+class Settimes(Binary):
+    """Binary expressions with a '<*>'"""
+    def __init__(self, lexspan, left, right):
+        # self.type = "<*>"
+        Binary.__init__(self, lexspan, "<*>", left, right)
 
-        def check(self):
-            set_scope(self.left, self.scope)
-            set_scope(self.right, self.scope)
-            left = self.left.check()
-            right = self.right.check()
-            type_tuples = [('INT', 'SET')]
-            return check_bin(self.lexspan, self.operator, left, right, type_tuples)
-
-
-    class SetMod(Binary):
-        """Binary expressions with a '<%>'"""
-        def __init__(self, lexspan, left, right):
-            # self.type = "<%>"
-            Binary.__init__(self, lexspan, "<%>", left, right)
-
-        def check(self):
-            set_scope(self.left, self.scope)
-            set_scope(self.right, self.scope)
-            left = self.left.check()
-            right = self.right.check()
-            type_tuples = [('INT', 'SET')]
-            return check_bin(self.lexspan, self.operator, left, right, type_tuples)
-
-    class SetDivition(Binary):
-        """Binary expressions with a '</>'"""
-        def __init__(self, lexspan, left, right):
-            # self.type = "</>"
-            Binary.__init__(self, lexspan, "</>", left, right)
-
-        def check(self):
-            set_scope(self.left, self.scope)
-            set_scope(self.right, self.scope)
-            left = self.left.check()
-            right = self.right.check()
-            type_tuples = [('INT', 'SET')]
-            return check_bin(self.lexspan, self.operator, left, right, type_tuples)
-    
-    ######        Cojunto sobre Conjunto       ######
-
-    class SetIntersection(Binary):
-        """Binary expressions with a '><'"""
-        def __init__(self, lexspan, left, right):
-            # self.type = "><"
-            Binary.__init__(self, lexspan, "><", left, right)
-
-        def check(self):
-            set_scope(self.left, self.scope)
-            set_scope(self.right, self.scope)
-            left = self.left.check()
-            right = self.right.check()
-            type_tuples = [('SET', 'SET')]
-            return check_bin(self.lexspan, self.operator, left, right, type_tuples)
-
-    class SetUnion(Binary):
-        """Binary expressions with a '++'"""
-        def __init__(self, lexspan, left, right):
-            # self.type = "<>"
-            Binary.__init__(self, lexspan, "++", left, right)
-
-        def check(self):
-            set_scope(self.left, self.scope)
-            set_scope(self.right, self.scope)
-            left = self.left.check()
-            right = self.right.check()
-            type_tuples = [('SET', 'SET')]
-            return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+    def check(self):
+        set_scope(self.left, self.scope)
+        set_scope(self.right, self.scope)
+        left = self.left.check()
+        right = self.right.check()
+        type_tuples = [('INT', 'SET')]
+        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
 
-    class SetDifference(Binary):
-        """Binary expressions with a '/'"""
-        def __init__(self, lexspan, left, right):
-            # self.type = "<>"
-            Binary.__init__(self, lexspan, "/", left, right)
+class Setmod(Binary):
+    """Binary expressions with a '<%>'"""
+    def __init__(self, lexspan, left, right):
+        # self.type = "<%>"
+        Binary.__init__(self, lexspan, "<%>", left, right)
 
-        def check(self):
-            set_scope(self.left, self.scope)
-            set_scope(self.right, self.scope)
-            left = self.left.check()
-            right = self.right.check()
-            type_tuples = [('SET', 'SET')]
-            return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+    def check(self):
+        set_scope(self.left, self.scope)
+        set_scope(self.right, self.scope)
+        left = self.left.check()
+        right = self.right.check()
+        type_tuples = [('INT', 'SET')]
+        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+class Setdivition(Binary):
+    """Binary expressions with a '</>'"""
+    def __init__(self, lexspan, left, right):
+        # self.type = "</>"
+        Binary.__init__(self, lexspan, "</>", left, right)
+
+    def check(self):
+        set_scope(self.left, self.scope)
+        set_scope(self.right, self.scope)
+        left = self.left.check()
+        right = self.right.check()
+        type_tuples = [('INT', 'SET')]
+        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+######        Cojunto sobre Conjunto       ######
+
+class Setintersection(Binary):
+    """Binary expressions with a '><'"""
+    def __init__(self, lexspan, left, right):
+        # self.type = "><"
+        Binary.__init__(self, lexspan, "><", left, right)
+
+    def check(self):
+        set_scope(self.left, self.scope)
+        set_scope(self.right, self.scope)
+        left = self.left.check()
+        right = self.right.check()
+        type_tuples = [('SET', 'SET')]
+        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+class Setunion(Binary):
+    """Binary expressions with a '++'"""
+    def __init__(self, lexspan, left, right):
+        # self.type = "<>"
+        Binary.__init__(self, lexspan, "++", left, right)
+
+    def check(self):
+        set_scope(self.left, self.scope)
+        set_scope(self.right, self.scope)
+        left = self.left.check()
+        right = self.right.check()
+        type_tuples = [('SET', 'SET')]
+        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+
+class Setdifference(Binary):
+    """Binary expressions with a '/'"""
+    def __init__(self, lexspan, left, right):
+        # self.type = "<>"
+        Binary.__init__(self, lexspan, "/", left, right)
+
+    def check(self):
+        set_scope(self.left, self.scope)
+        set_scope(self.right, self.scope)
+        left = self.left.check()
+        right = self.right.check()
+        type_tuples = [('SET', 'SET')]
+        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
 
 ######        Operadores Booleanos        ######

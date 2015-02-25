@@ -110,25 +110,25 @@ tokens = [
 
 
 # Token de Entero
-def t_PLUS(token):
-    r'\+'
-    token.endlexpos = token.lexpos + len(token.value) - 1
-    return token 
+#def t_PLUS(token):
+t_PLUS = r'\+'
+#    token.endlexpos = token.lexpos + len(token.value) - 1
+#    return token 
 
-def t_MINUS(token):
-    r'-'
-    token.endlexpos = token.lexpos + len(token.value) - 1
-    return token 
+#def t_MINUS(token):
+t_MINUS = r'-'
+#    token.endlexpos = token.lexpos + len(token.value) - 1
+#    return token 
 
 def t_TIMES(token):
     r'\*'
     token.endlexpos = token.lexpos + len(token.value) - 1
     return token 
 
-def t_DIVIDE(token):
-    r'/'
-    token.endlexpos = token.lexpos + len(token.value) - 1
-    return token 
+#def t_DIVIDE(token):
+t_DIVIDE = r'/'
+#    token.endlexpos = token.lexpos + len(token.value) - 1
+#    return token 
 
 def t_MODULE(token):
     r'%'
@@ -138,13 +138,13 @@ def t_MODULE(token):
 
 # Token de Set
 
-def t_LESS(token):
-    r'\<'
-    token.endlexpos = token.lexpos + len(token.value) - 1
-    return token 
+#def t_LESS(token):
+t_LESS = r'<'
+#    token.endlexpos = token.lexpos + len(token.value) - 1
+#    return token 
 
 def t_GREAT(token):
-    r'\>'
+    r'>'
     token.endlexpos = token.lexpos + len(token.value) - 1
     return token 
 
@@ -175,7 +175,7 @@ def t_CLOSEPAREN(token):
     r'\)'
     token.endlexpos = token.lexpos + len(token.value) - 1
     return token 
-    
+
 def t_OPENCURLY(token):
     r'\{'
     token.endlexpos = token.lexpos + len(token.value) - 1
@@ -257,10 +257,10 @@ def t_SETINTERSECTION(token):
     token.endlexpos = token.lexpos + 1
     return token
 
-def t_SETUNION(token):
-    r'\+\+'
-    token.endlexpos = token.lexpos + 1
-    return token
+#def t_SETUNION(token):
+t_SETUNION = r'\+\+'
+#    token.endlexpos = token.lexpos + 1
+#    return token
 
 def t_SETDIFFERENCE(token):
     r'\\'
@@ -308,6 +308,7 @@ def t_newline(token):
 
 # To find the column number of the current line
 def find_column(text, lexpos):
+    #print lexpos
     last_new = text.rfind('\n', 0, lexpos)
     if last_new < 0:
         last_new = -1

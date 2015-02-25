@@ -57,7 +57,7 @@ def main(argv=None):
                 print ': ' + tok.value,
             print '(Línea ' + str(tok.lineno) + ',',
             print 'Columna ' + str(find_column(file_string,tok.lexer.lexpos)) + ')'
-        print "\n"
+
 
     # Check for Overflow or Unexpected character errors
     if parser.lexer_error:
