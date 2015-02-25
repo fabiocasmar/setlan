@@ -1,0 +1,15 @@
+program {
+  using
+    int  a, b; # inicializan en 0
+    set  c, d; # inicializan en {}
+    set  z;
+    bool e, f; # inicializan en false
+  in
+
+  a = 10;
+  scan b;
+  c = {1,2,3};
+  d = {2,3,4};
+  z = c+d;
+
+}

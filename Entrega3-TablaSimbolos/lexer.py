@@ -108,27 +108,41 @@ tokens = [
            'CLOSECURLY'
 ] + list(RESERVED.values())
 
+def t_SETINTERSECTION(token):
+    r'\>\<'
+    token.endlexpos = token.lexpos + 1
+    return token
 
+def t_SETUNION(token):
+   r'\+\+'
+   token.endlexpos = token.lexpos + 1
+   return token
+
+def t_SETDIFFERENCE(token):
+    r'\\'
+    token.endlexpos = token.lexpos + 1
+    return token
+    
 # Token de Entero
-#def t_PLUS(token):
-t_PLUS = r'\+'
-#    token.endlexpos = token.lexpos + len(token.value) - 1
-#    return token 
+def t_PLUS(token):
+   r'\+'
+   token.endlexpos = token.lexpos + len(token.value) - 1
+   return token 
 
-#def t_MINUS(token):
-t_MINUS = r'-'
-#    token.endlexpos = token.lexpos + len(token.value) - 1
-#    return token 
+def t_MINUS(token):
+   r'-'
+   token.endlexpos = token.lexpos + len(token.value) - 1
+   return token 
 
 def t_TIMES(token):
     r'\*'
     token.endlexpos = token.lexpos + len(token.value) - 1
     return token 
 
-#def t_DIVIDE(token):
-t_DIVIDE = r'/'
-#    token.endlexpos = token.lexpos + len(token.value) - 1
-#    return token 
+def t_DIVIDE(token):
+   r'/'
+   token.endlexpos = token.lexpos + len(token.value) - 1
+   return token 
 
 def t_MODULE(token):
     r'%'
@@ -138,10 +152,10 @@ def t_MODULE(token):
 
 # Token de Set
 
-#def t_LESS(token):
-t_LESS = r'<'
-#    token.endlexpos = token.lexpos + len(token.value) - 1
-#    return token 
+def t_LESS(token):
+   r'<'
+   token.endlexpos = token.lexpos + len(token.value) - 1
+   return token 
 
 def t_GREAT(token):
     r'>'
@@ -252,20 +266,7 @@ def t_SETLEN(token):
     token.endlexpos = token.lexpos + 1
     return token
 
-def t_SETINTERSECTION(token):
-    r'\>\<'
-    token.endlexpos = token.lexpos + 1
-    return token
 
-#def t_SETUNION(token):
-t_SETUNION = r'\+\+'
-#    token.endlexpos = token.lexpos + 1
-#    return token
-
-def t_SETDIFFERENCE(token):
-    r'\\'
-    token.endlexpos = token.lexpos + 1
-    return token
 
 # token de booleano
 
