@@ -333,7 +333,7 @@ class Repeat(Statement):
         self.statement = statement
 
     def print_tree(self, level):
-        string = indent(level) + "WHILE\n"
+        string = indent(level) + "REPEAT\n"
         string += indent(level + 1) + "DO statement:\n"
         string += self.statement.print_tree(level + 2)
         string += indent(level + 1) + "condition:\n"
@@ -347,6 +347,18 @@ class Repeat(Statement):
         #   string += indent(level + 1) + "condition:\n"
         #   string += self.condition.print_tree(level + 2) + '\n'
         return ""
+
+    def check(self):
+        boolean = True
+        set_scope(self.condition, self.scope)
+        set_scope(self.statement, self.scope)
+        if self.statement.check() is False:
+            boolean = False
+        if not error_invalid_expression(exp_type, self.condition,
+                                     "'repeat' condition", 'BOOL'):
+            boolean = False
+        exp_type = self.condition.check()
+        return boolean
 
 class RepeatWhile(Statement):
     """Declaracion repeat-while, toma una expresion"""
@@ -367,16 +379,30 @@ class RepeatWhile(Statement):
 
     def print_tree(self, level):
         string = ""
-    #    FALTA TERMINAR AQUI
-    #    string = indent(level) + "WHILE\n"
-    #    string += indent(level + 1) + "DO statement:\n"
-    #    string += self.statement.print_tree(level + 2)
-    #    string += indent(level + 1) + "condition:\n"
-    #    string += self.condition.print_tree(level + 2) + '\n'
-    #    string += indent(level + 1) + "DO statement2:\n"
-    #    string += self.statement2.print_tree(level + 2)
+        #    FALTA TERMINAR AQUI
+        #    string = indent(level) + "WHILE\n"
+        #    string += indent(level + 1) + "DO statement:\n"
+        #    string += self.statement.print_tree(level + 2)
+        #    string += indent(level + 1) + "condition:\n"
+        #    string += self.condition.print_tree(level + 2) + '\n'
+        #    string += indent(level + 1) + "DO statement2:\n"
+        #    string += self.statement2.print_tree(level + 2)
         return string
 
+    def check(self):
+        boolean = True
+        set_scope(self.condition, self.scope)
+        set_scope(self.statement, self.scope)
+        set_scope(self.statement2, self.scope)
+        if self.statement.check() is False:
+            boolean = False
+        exp_type = self.condition.check()
+        if self.statement2.check() is False:
+            boolean = False
+        if not error_invalid_expression(exp_type, self.condition,
+                                     "'repeat', 'while', condition", 'BOOL'):
+            boolean = False
+        return boolean
 
 class Expression: pass
 
