@@ -1,0 +1,12 @@
+program{
+	using 
+		int a;
+		set c,d;
+		set z;
+	in
+	a = 10;
+	scan a;
+	c = {1,2,3};
+	d = {1,2,3,4};
+	z = a<+>c;
+}

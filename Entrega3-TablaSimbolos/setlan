@@ -61,14 +61,14 @@ def main(argv=None):
 
     # Check for Overflow or Unexpected character errors
     if parser.lexer_error:
-        ast = None
         for error in parser.lexer_error:
             print error
+        exit(1)
     # Check for Syntax errors
     elif parser.parser_error:
-        ast = None
         for error in parser.parser_error:
             print error
+        exit(1)
 
     # Check for Static errors
     elif parser.static_error:
@@ -82,6 +82,7 @@ def main(argv=None):
         if tabla_salida:
             print ast.print_symtab()
             print "\n"
+    exit(0)
 
 
 

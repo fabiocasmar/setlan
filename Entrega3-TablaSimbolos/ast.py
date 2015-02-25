@@ -565,7 +565,7 @@ def check_bin(lexspan, operator, left, right, types):
             if t_return is not None:
                 return t_return
             else:
-                return left
+                return right
         if left != t_left:
             count2=count2+1
         if right != t_right:
@@ -693,7 +693,7 @@ class Setplus(Binary):
         left = self.left.check()
         right = self.right.check()
         type_tuples = [('INT', 'SET')]
-        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+        check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
 class Setminus(Binary):
     """Binary expressions with a '<->'"""
@@ -1002,7 +1002,7 @@ class Setmax(Unary):
     def check(self):
         set_scope(self.operand, self.scope)
         operand = self.operand.check()
-        types = [('SET',)]
+        types = [('SET','INT')]
         return check_unary(self.lexspan, self.operator, operand, types)
 
 
@@ -1014,7 +1014,7 @@ class Setmin(Unary):
     def check(self):
         set_scope(self.operand, self.scope)
         operand = self.operand.check()
-        types = [('SET',)]
+        types = [('SET','INT')]
         return check_unary(self.lexspan, self.operator, operand, types)
 
 class SetLen(Unary):
@@ -1025,7 +1025,7 @@ class SetLen(Unary):
     def check(self):
         set_scope(self.operand, self.scope)
         operand = self.operand.check()
-        types = [('SET',)]
+        types = [('SET','INT')]
         return check_unary(self.lexspan, self.operator, operand, types)
 
 class Not(Unary):

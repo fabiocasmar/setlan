@@ -390,7 +390,7 @@ def p_exp_binary(symbol):
     elif operator == 'SETDIVITION':
         symbol[0] = Setdivition((start, end), symbol[1], symbol[3])
     elif operator == 'SETMOD':
-        symbol[0] = Setmmod((start, end), symbol[1], symbol[3])
+        symbol[0] = Setmod((start, end), symbol[1], symbol[3])
     elif operator == 'OR':
         symbol[0] = Or((start, end), symbol[1], symbol[3])
     elif operator == 'AND':
@@ -484,10 +484,9 @@ def p_exp_set_unary(symbol):
 # Error a imprimir si el parser encuentra un error
 def p_error(symbol):
     if symbol:
-        text = symbol.lexer.lexdata
-        message = "ERROR: Syntax error at line %d, column %d: "
-        message += "Unexpected token '%s'"
-        data = (symbol.lineno, find_column(text, symbol), symbol.value)
+        text = lexer.lexdata
+        message = "ERROR: unexpected token '%s' at line %d, column %d"
+        data = (symbol.value, symbol.lineno, find_column(text, symbol.lexpos))
         parser_error.append(message % data)
     else:
         parser_error.append("ERROR: Syntax error at EOF")

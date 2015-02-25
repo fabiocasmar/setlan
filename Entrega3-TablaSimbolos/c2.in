@@ -1,0 +1,42 @@
+program {
+	using
+		int a,b,c;
+		set d,e,f;
+		bool g,h;
+	in
+	e = a<+>d;
+	e = a<->d;
+	e = a<*>d;
+	e = a</>d;
+	e = a<%>d;
+
+	if (a == b hjg) 
+		println "jhfd"
+	else if(a/=b)
+		print "hhiih"
+	else if(a>b)
+		print "hhiih"
+	else if(a>=b)
+		print "hhiih"
+	else if(a<=b)
+		print "hhiih"
+	else if(a<=b)
+		print "hhiih"
+	else if(a<=b)
+		print "hhiih"
+	else if( (>? d) == 5)
+		print "hhiih";			
+
+#	if (a == b) 
+#		println "jhfd";
+#	if (a == b) 
+#		println "jhfd";
+#	if (a == b) 
+#		println "jhfd";
+#	if (a == b) 
+#		println "jhfd";
+#	if (a == b) 
+#		println "jhfd";
+#	if (a == b) 
+#		println "jhfd";
+}

@@ -123,6 +123,42 @@ def t_SETDIFFERENCE(token):
     token.endlexpos = token.lexpos + 1
     return token
     
+
+
+# Token de Separacion
+def t_COMMA(token):
+    r','
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
+
+def t_SEMICOLON(token):
+    r';'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
+
+
+# token de booleano
+
+def t_LESSEQ(token):
+    r'\<\='
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_GREATEQ(token):
+    r'\>\='
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_EQUAL(token):
+    r'\=\='
+    token.endlexpos = token.lexpos + 1
+    return token
+
+def t_UNEQUAL(token):
+    r'\/\='
+    token.endlexpos = token.lexpos + 1
+    return token
+
 # Token de Entero
 def t_PLUS(token):
    r'\+'
@@ -150,16 +186,6 @@ def t_MODULE(token):
     return token 
 
 
-# Token de Separacion
-def t_COMMA(token):
-    r','
-    token.endlexpos = token.lexpos + len(token.value) - 1
-    return token 
-
-def t_SEMICOLON(token):
-    r';'
-    token.endlexpos = token.lexpos + len(token.value) - 1
-    return token 
 
 # Token de Asignacion
 def t_ASSIGN(token):
@@ -256,27 +282,7 @@ def t_SETLEN(token):
 
 
 
-# token de booleano
 
-def t_LESSEQ(token):
-    r'\<\='
-    token.endlexpos = token.lexpos + 1
-    return token
-
-def t_GREATEQ(token):
-    r'\>\='
-    token.endlexpos = token.lexpos + 1
-    return token
-
-def t_EQUAL(token):
-    r'\=\='
-    token.endlexpos = token.lexpos + 1
-    return token
-
-def t_UNEQUAL(token):
-    r'\/\='
-    token.endlexpos = token.lexpos + 1
-    return token
 
 
 # Token de Comparacion
