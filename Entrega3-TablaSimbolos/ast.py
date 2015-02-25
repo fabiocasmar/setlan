@@ -328,7 +328,7 @@ class While(Statement):
 
 class Repeat(Statement):
     """Declaracion repeat, toma una expresion"""
-    def __init__(self, statement, condition):
+    def __init__(self, lexspan, statement, condition):
         self.condition = condition
         self.statement = statement
 
@@ -362,7 +362,7 @@ class Repeat(Statement):
 
 class RepeatWhile(Statement):
     """Declaracion repeat-while, toma una expresion"""
-    def __init__(self, statement, condition, statement2):
+    def __init__(self,  lexspan, statement, condition, statement2):
         self.condition  = condition
         self.statement  = statement
         self.statement2 = statement2
@@ -963,7 +963,9 @@ def check_unary(lexspan, operator, operand, types):
 
 class Unary(Expression):
     """Expresion unaria"""
-    def __init__(self, operator, operand):
+    def __init__(self, lexspan, operator, operand):
+        # self.type = "unary: "
+        self.lexspan = lexspan
         self.operator = operator
         self.operand = operand
 

@@ -1,8 +1,9 @@
 program {
 	using 
 		set i;
+		int x;	
 	in
-	i = {};
+	x = i+1 ;
 }
 
 #PROGRAM
