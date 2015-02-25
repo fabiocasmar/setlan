@@ -33,12 +33,13 @@ class SymTable(object):
         else:
             return False
 
-    def print_tree(self, level):
+    def print_symtab(self, level):
         string = indent(level) + "SCOPE\n"
         for var in self.scope:
             sym = self.scope[var]
-            string += indent(level + 1) + str(sym) + '\n'
-        return string[:-1]
+            string += indent(level+1) + str(sym) + '\n'
+        string += indent(level) + "END_SCOPE\n"
+        return string
 
     def insert(self, key, data_type, protected=False):
         if not self.is_local(key):
@@ -113,4 +114,4 @@ class Symbol(object):
             value = " = " + self.value
         else:
             value = ""
-        return self.name + value + ' : ' + self.data_type + protected
+        return "Variable: " + self.name + ' | Type: ' + str(self.data_type).lower() + " | Value:" + value 

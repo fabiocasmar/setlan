@@ -32,6 +32,9 @@ class Program:
     def __str__(self):
         return "PROGRAM\n" + self.statement.print_tree(1)
 
+    def print_symtab(self):
+        return str(self.statement.print_symtab(1))
+
     def check(self):
         set_scope(self.statement, self.scope)
         return self.statement.check()
@@ -67,6 +70,10 @@ class Assign(Statement):
         string += "variable: " + str(self.variable)
         string += "\n" + indent(level + 1)
         string += "value:\n" + self.expression.print_tree(level + 2)
+        return string
+
+    def print_symtab(self,level):
+        string = ""
         return string
 
     def check(self):
@@ -114,9 +121,9 @@ class Block(Statement):
     def print_tree(self, level):
         string = indent(level) + "BEGIN\n"
 
-        if self.scope:
-            string += self.scope.print_tree(level) + '\n'
-        string += indent(level) + "STATEMENTS\n"
+        #if self.scope:
+        #    string += self.scope.print_tree(level) + '\n'
+        #string += indent(level) + "STATEMENTS\n"
 
         for stat in self.statements:
             string += stat.print_tree(level + 1) + '\n'
@@ -126,14 +133,25 @@ class Block(Statement):
 
         return string
 
+    def print_symtab(self, level):
+        level = level -1
+        string = indent(level) + "Symbol Table\n"
+
+        if self.scope:
+            string += self.scope.print_symtab(level) + '\n'
+
+        for stat in self.statements:
+            string += stat.print_symtab(level) + '\n'
+            string += indent(level)
+        #string = string[:(-10 - len(indent(1)))]
+        return string       
+
     def check(self):
         boolean = True
-
         for stat in self.statements:
             set_scope(stat, self.scope)
             if stat.check() is False:
                 boolean = False
-
         return boolean
 
 class Scan(Statement):
@@ -146,6 +164,9 @@ class Scan(Statement):
     def print_tree(self, level):
         string = indent(level) + "SCAN\n"
         string += indent(level + 1) + "variable: " + str(self.variable)
+        return string
+
+    def print_symtab(self, level):
         return string
 
     def check(self):
@@ -175,6 +196,9 @@ class Print(Statement):
             string += elem.print_tree(level + 2) + '\n'
 
         return string[:-1]
+
+    def print_symtab(self, level):
+        return string
 
     def check(self):
         boolean = True
@@ -211,6 +235,12 @@ class If(Statement):
         if self.else_st:
             string += '\n' + indent(level + 1) + "else:\n"
             string += self.else_st.print_tree(level + 2)
+        return string
+
+    def print_symtab(self, level):
+        string += self.then_st.print_symtab(level)
+        if self.else_st:
+            string += self.else_st.print_symtab(level)
         return string
 
     def check(self):
@@ -254,6 +284,17 @@ class For(Statement):
         string += self.statement.print_tree(level + 2)
         return string
 
+    def print_symtab(self, level):
+        string = ""
+        #FALTA TERMINAR AQUI
+        #  string += indent(level + 1) + "variable: " + str(self.variable) + '\n'
+        #  string += indent(level + 1) + str(self.dire) + ":\n"
+        #  string += self.in_set.print_tree(level + 2) + '\n'
+        #  string += indent(level + 1) + "DO statement:\n"
+        #  string += self.statement.print_tree(level + 2)
+        return string
+
+
 
 class While(Statement):
     """Declaracion while, toma una expresion"""
@@ -269,6 +310,11 @@ class While(Statement):
         string += self.condition.print_tree(level + 2) + '\n'
         string += indent(level + 1) + "DO statement:\n"
         string += self.statement.print_tree(level + 2)
+        return string
+
+
+    def print_symtab(self, level):
+        string += self.statement.print_symtab(level)
         return string
 
 
@@ -299,6 +345,15 @@ class Repeat(Statement):
         string += self.condition.print_tree(level + 2) + '\n'
         return string
 
+    def print_symtab(self, level):
+        string = ""
+        #   string = indent(level) + "WHILE\n"
+        #   string += indent(level + 1) + "DO statement:\n"
+        #   string += self.statement.print_tree(level + 2)
+        #   string += indent(level + 1) + "condition:\n"
+        #   string += self.condition.print_tree(level + 2) + '\n'
+        return string
+
 class RepeatWhile(Statement):
     """Declaracion repeat-while, toma una expresion"""
     def __init__(self, statement, condition, statement2):
@@ -314,6 +369,18 @@ class RepeatWhile(Statement):
         string += self.condition.print_tree(level + 2) + '\n'
         string += indent(level + 1) + "DO statement2:\n"
         string += self.statement2.print_tree(level + 2)
+        return string
+
+    def print_tree(self, level):
+        string = ""
+    #    FALTA TERMINAR AQUI
+    #    string = indent(level) + "WHILE\n"
+    #    string += indent(level + 1) + "DO statement:\n"
+    #    string += self.statement.print_tree(level + 2)
+    #    string += indent(level + 1) + "condition:\n"
+    #    string += self.condition.print_tree(level + 2) + '\n'
+    #    string += indent(level + 1) + "DO statement2:\n"
+    #    string += self.statement2.print_tree(level + 2)
         return string
 
 
@@ -345,6 +412,10 @@ class Variable(Expression):
     def print_tree(self, level):
         return indent(level) + "VARIABLE: " + str(self.name)
 
+    def print_symtab(self, level):
+        string = ""
+        return string
+
     def check(self):
         if self.scope.is_member(self):
             variable = self.scope.find(self)
@@ -370,6 +441,10 @@ class Int(Expression):
     def print_tree(self, level):
         return indent(level) + "INT: " + str(self.value)
 
+    def print_symtab(self, level):
+        string = ""
+        return string
+
     def check(self):
         return 'INT'
 
@@ -386,6 +461,10 @@ class Bool(Expression):
 
     def print_tree(self, level):
         return indent(level) + "BOOL: " + str(self.value)
+
+    def print_symtab(self, level):
+        string = ""
+        return string
 
     def check(self):
         return 'BOOL'
@@ -407,6 +486,9 @@ class Set(Expression):
             string+= i.print_tree(level+1)+ '\n'
         return string
 
+    def print_symtab(self, level):
+        string = ""
+        return string
 
 class String(Expression):
     """Clase a definir una cadena de caracteres"""
@@ -422,6 +504,9 @@ class String(Expression):
     def check(self):
         return 'STRING'
 
+    def print_symtab(self, level):
+        string = ""
+        return string
 
 def error_unsuported_binary(lexspan, operator, left, right):
     message = "ERROR: unsupported operator '%s' for types '%s' and '%s' "
@@ -463,6 +548,10 @@ class Binary(Expression):
     def __str__(self):
         string = str(self.operator) + ' ('
         string += str(self.left) + ', ' + str(self.right) + ')'
+        return string
+
+    def print_symtab(self, level):
+        string = ""
         return string
 
     def print_tree(self, level):

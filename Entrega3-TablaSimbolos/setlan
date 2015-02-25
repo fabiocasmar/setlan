@@ -8,7 +8,8 @@ Antonio, Scaramazza 11-10957
 
 
 import parser
-
+import lexer
+from lexer import find_column 
 
 def main(argv=None):
     import sys      # argv, exit
@@ -19,19 +20,42 @@ def main(argv=None):
     if len(argv) == 1:
         print "ERROR: No input file"
         return
-    elif len(argv) > 2:
+    elif len(argv) > 5:
         print "ERROR: Invalid number of arguments"
         return
 
     try:
         # Opens and reads file to interpret
-        file_string = open(argv[1], 'r').read()
+        file_string = open(argv[len(argv)-1], 'r').read()
     except IOError:
         print "ERROR: Must give an input file"
         return
 
+    i = 1
+    token_salida = 0
+    arbol_salida = 0
+    tabla_salida = 0
+    while i <= len(argv)-2:
+        if(argv[i]=="-t"):
+            token_salida = 1
+        if(argv[i]=="-a"):
+            arbol_salida = 1
+        if(argv[i]=="-s"):
+            tabla_salida = 1
+        i=i+1 
+
     ast = parser.parsing(file_string)
 
+    if  token_salida:
+        tokens_list = lexer.lexing(file_string)
+        for tok in tokens_list:
+            print 'Token' + str(tok.type),
+            if str(tok.type) == 'ID':
+                print ': "' + tok.value + '"',
+            elif str(tok.type) == 'String':
+                print ': ' + tok.value,
+            print '(Línea ' + str(tok.lineno) + ',',
+            print 'Columna ' + str(find_column(file_string,tok.lexer.lexpos)) + ')'
     # Check for Overflow or Unexpected character errors
     if parser.lexer_error:
         ast = None
@@ -43,7 +67,11 @@ def main(argv=None):
         for error in parser.parser_error:
             print error
     else:
-        print ast
+        if arbol_salida:
+            print ast 
+        if tabla_salida:
+            print ast.print_symtab()
+
 
 
 if __name__ == "__main__":
