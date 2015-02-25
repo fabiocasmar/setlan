@@ -110,29 +110,72 @@ tokens = [
 
 
 # Token de Entero
-t_PLUS = r'\+'
-t_MINUS = r'-'
-t_TIMES = r'\*'
-t_DIVIDE = r'/'
-t_MODULE = r'%'
+def t_PLUS(token):
+    r'\+'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
+
+def t_MINUS(token):
+    r'-'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
+
+def t_TIMES(token):
+    r'\*'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
+
+def t_DIVIDE(token):
+    r'/'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
+
+def t_MODULE(token):
+    r'%'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
+
 
 # Token de Set
 
-t_LESS = r'\<'
-t_GREAT = r'\>'
+def t_LESS(token):
+    r'\<'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
+
+def t_GREAT(token):
+    r'\>'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
 
 # Token de Separacion
+def t_COMMA(token):
+    r','
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
 
-t_COMMA = r','
-t_SEMICOLON = r';'
+def t_SEMICOLON(token):
+    r';'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
 
 # Token de Asignacion
-t_ASSIGN = r'='
+def t_ASSIGN(token):
+    r'='
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
 
 # Token de Parentizacion
-t_OPENPAREN = r'\('
-t_CLOSEPAREN = r'\)'
+def t_OPENPAREN(token):
+    r'\('
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
 
+def t_CLOSEPAREN(token):
+    r'\)'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
+    
 def t_OPENCURLY(token):
     r'\{'
     token.endlexpos = token.lexpos + len(token.value) - 1

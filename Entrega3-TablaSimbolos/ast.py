@@ -135,7 +135,7 @@ class Block(Statement):
 
     def print_symtab(self, level):
         level = level -1
-        string = indent(level) + "Symbol Table\n"
+        string = indent(level) + "Symbol Table:\n"
 
         if self.scope:
             string += self.scope.print_symtab(level) + '\n'
