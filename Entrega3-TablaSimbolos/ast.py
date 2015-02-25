@@ -990,7 +990,7 @@ class UMinus(Unary):
 
 ##### Operadores Unarios sobre Conjuntos ######
 
-class SetMax(Unary):
+class Setmax(Unary):
     """Unary expressions with a '>?'"""
     def __init__(self, lexspan, operand):
         Unary.__init__(self, lexspan, ">?", operand)
@@ -1002,7 +1002,7 @@ class SetMax(Unary):
         return check_unary(self.lexspan, self.operator, operand, types)
 
 
-class SetMin(Unary):
+class Setmin(Unary):
     """Unary expressions with a '<?'"""
     def __init__(self, lexspan, operand):
         Unary.__init__(self, lexspan, "<?", operand)

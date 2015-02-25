@@ -468,17 +468,15 @@ def p_exp_set_unary(symbol):
     }[symbol[1]].upper()              
 
     start, _ = span(symbol, 1)
-    _, end = span(symbol, 2)
-    symbol[0] = Unary(operator, symbol[2])          
-
+    _, end = span(symbol, 2)       
     if operator == 'SETMAX':
-        symbol[0] = Setmax((start, end), symbol[3])
+        symbol[0] = Setmax((start, end), symbol[2])
     elif operator == 'SETMIN':
-        symbol[0] = Setmin((start, end), symbol[3])
+        symbol[0] = Setmin((start, end), symbol[2])
     elif operator == 'SETLEN':
-        symbol[0] = Setlen((start, end), symbol[3])
+        symbol[0] = Setlen((start, end), symbol[2])
     else:
-        symbol[0] = Unary((start, end), operator, symbol[3])
+        symbol[0] = Unary((start, end), operator, symbol[2])
 
 
 

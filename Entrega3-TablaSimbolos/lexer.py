@@ -150,18 +150,6 @@ def t_MODULE(token):
     return token 
 
 
-# Token de Set
-
-def t_LESS(token):
-   r'<'
-   token.endlexpos = token.lexpos + len(token.value) - 1
-   return token 
-
-def t_GREAT(token):
-    r'>'
-    token.endlexpos = token.lexpos + len(token.value) - 1
-    return token 
-
 # Token de Separacion
 def t_COMMA(token):
     r','
@@ -289,6 +277,19 @@ def t_UNEQUAL(token):
     r'\/\='
     token.endlexpos = token.lexpos + 1
     return token
+
+
+# Token de Comparacion
+
+def t_LESS(token):
+   r'<'
+   token.endlexpos = token.lexpos + len(token.value) - 1
+   return token 
+
+def t_GREAT(token):
+    r'>'
+    token.endlexpos = token.lexpos + len(token.value) - 1
+    return token 
 
 
 #token de booleano sobre entero
