@@ -160,9 +160,14 @@ class Scan(Statement):
     def check(self):
         set_scope(self.variable, self.scope)
         var_type = self.variable.check()
-
-        if var_type is None:
+        if (var_type is None):
             return False
+        elif(self.variable.check() == "SET"):
+            message = "ERROR: unsupported type '%s' for scan "
+            message += "from line %d, column %d"
+            s_lin, s_col = self.lexspan[1]
+            data = str(self.variable), s_lin, s_col
+            static_error.append(message % data)
         else:
             return True
 
@@ -280,10 +285,18 @@ class For(Statement):
 
     def check(self):
         boolean = True
+        print self.in_set
+        if(self.in_set.check() != "SET"):
+            message = "ERROR: unsupported type '%s' for scan "
+            message += "from line %d, column %d"
+            s_lin, s_col = self.lexspan[1]
+            data = str(self.variable), s_lin, s_col
+            static_error.append(message % data)
+            boolean = False
         set_scope(self.statement, self.scope)
         if self.statement.check() is False:
             boolean = False
-        return True
+        return boolean
 
 
 class While(Statement):
@@ -377,10 +390,10 @@ class RepeatWhile(Statement):
         if self.statement.check() is False:
             boolean = False
         exp_type = self.condition.check()
-        if self.statement2.check() is False:
-            boolean = False
         if not error_invalid_expression(exp_type, self.condition,
                                      "'repeat', 'while', condition", 'BOOL'):
+            boolean = False
+        if self.statement2.check() is False:
             boolean = False
         return boolean
 
@@ -539,6 +552,8 @@ def error_unsuported_binary(lexspan, operator, left, right):
 
 # Checks that the left and right operator has any of the accepted layouts
 def check_bin(lexspan, operator, left, right, types):
+    count = 0
+    count2 = 0
     for type_tuple in types:
         t_return = None
         if len(type_tuple) == 3:
@@ -551,9 +566,16 @@ def check_bin(lexspan, operator, left, right, types):
                 return t_return
             else:
                 return left
-
+        if left != t_left:
+            count2=count2+1
+        if right != t_right:
+            count=count+1
     if left is not None and right is not None:
         error_unsuported_binary(lexspan, operator, left, right)
+        if(len(types)-1==count):
+            return right
+        elif(len(types)-1==count2):
+            return left
     return None
 
 class Binary(Expression):
@@ -975,7 +997,7 @@ class UMinus(Unary):
 class Setmax(Unary):
     """Unary expressions with a '>?'"""
     def __init__(self, lexspan, operand):
-        Unary.__init__(self, lexspan, ">?", operand)
+        Unary.__init__(self, lexspan, ">?", operand) 
 
     def check(self):
         set_scope(self.operand, self.scope)

@@ -20,7 +20,7 @@ program {
     repeat {
         using int i; in
         print i;
-    } while (true + 2) do {
+    } while (true+2) do {
         scan i;
     };
 }

@@ -69,6 +69,11 @@ def main(argv=None):
         ast = None
         for error in parser.parser_error:
             print error
+
+    # Check for Static errors
+    elif parser.static_error:
+        for error in parser.static_error:
+            print error
     else:
         if arbol_salida:
             print "Syntactic Tree:"
