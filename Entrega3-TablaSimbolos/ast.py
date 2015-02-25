@@ -263,7 +263,8 @@ class For(Statement):
         self.in_set = in_set
         self.statement = statement
         self.dire = dire
-        scope.insert(self.variable, 'INT')
+        self.scope = scope
+        self.scope.insert(self.variable, 'INT')
 
     def print_tree(self, level):
         string = indent(level) + "FOR\n"
@@ -275,13 +276,7 @@ class For(Statement):
         return string
 
     def print_symtab(self, level):
-        #FALTA TERMINAR AQUI
-        #  string += indent(level + 1) + "variable: " + str(self.variable) + '\n'
-        #  string += indent(level + 1) + str(self.dire) + ":\n"
-        #  string += self.in_set.print_tree(level + 2) + '\n'
-        #  string += indent(level + 1) + "DO statement:\n"
-        #  string += self.statement.print_tree(level + 2)
-        return ""
+        return self.statement.print_symtab(level)
 
     def check(self):
         boolean = True
@@ -309,9 +304,7 @@ class While(Statement):
 
 
     def print_symtab(self, level):
-        string += self.statement.print_symtab(level)
-        return string
-
+        return self.statement.print_symtab(level)
 
     def check(self):
         boolean = True
@@ -341,12 +334,7 @@ class Repeat(Statement):
         return string
 
     def print_symtab(self, level):
-        #   string = indent(level) + "WHILE\n"
-        #   string += indent(level + 1) + "DO statement:\n"
-        #   string += self.statement.print_tree(level + 2)
-        #   string += indent(level + 1) + "condition:\n"
-        #   string += self.condition.print_tree(level + 2) + '\n'
-        return ""
+        return self.statement.print_symtab(level)
 
     def check(self):
         boolean = True
@@ -377,17 +365,9 @@ class RepeatWhile(Statement):
         string += self.statement2.print_tree(level + 2)
         return string
 
-    def print_tree(self, level):
-        string = ""
-        #    FALTA TERMINAR AQUI
-        #    string = indent(level) + "WHILE\n"
-        #    string += indent(level + 1) + "DO statement:\n"
-        #    string += self.statement.print_tree(level + 2)
-        #    string += indent(level + 1) + "condition:\n"
-        #    string += self.condition.print_tree(level + 2) + '\n'
-        #    string += indent(level + 1) + "DO statement2:\n"
-        #    string += self.statement2.print_tree(level + 2)
-        return string
+    def print_symtab(self, level):
+        return self.statement.print_symtab(level)
+        
 
     def check(self):
         boolean = True
