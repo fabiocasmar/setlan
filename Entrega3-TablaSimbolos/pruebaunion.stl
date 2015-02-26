@@ -29,6 +29,7 @@ while (true) do {
       int  usb, ucv; # inicializan en 0
   in
   a = a +1;
+  print "hkhksdhfhsdf";
 };
 
 #################EXPLOTAN###########

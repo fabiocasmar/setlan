@@ -24,7 +24,6 @@ def set_scope(target, scope):
 class Program:
     """Un programa consiste en expresiones"""
     def __init__(self, lexspan, statement):
-        # self.type = "program"
         self.lexspan = lexspan
         self.statement = statement
         self.scope = SymTable()
@@ -60,7 +59,6 @@ def error_invalid_expression(exp_type, place, place_string, should):
 class Assign(Statement):
     """Declaracion de asignacion"""
     def __init__(self, lexspan, variable, expression):
-        # self.type = "assign"
         self.lexspan = lexspan
         self.variable = variable
         self.expression = expression
@@ -102,7 +100,6 @@ class Assign(Statement):
 class Block(Statement):
     """Declaracion de bloque"""
     def __init__(self, lexspan, statements, scope=SymTable()):
-        # self.type = "block"
         self.lexspan = lexspan
         self.statements = statements
         self.scope = scope
@@ -131,7 +128,6 @@ class Block(Statement):
             string += stat.print_symtab(level+2) 
         if self.scope:
             string += indent(level-1) + "END_SCOPE\n"
-        #string = string[:(-10 - len(indent(1)))]
         return string       
 
     def check(self):
@@ -145,7 +141,6 @@ class Block(Statement):
 class Scan(Statement):
     """Declaracion scan, se aplica sobre una variable """
     def __init__(self, lexspan, variable):
-        # self.type = "read"
         self.lexspan = lexspan
         self.variable = variable
 
@@ -174,7 +169,6 @@ class Scan(Statement):
 class Print(Statement):
     """Write statement, for printing in standard output"""
     def __init__(self, lexspan, elements):
-        # self.type = "write"
         self.lexspan = lexspan
         self.elements = elements
 
@@ -206,13 +200,11 @@ class PrintLn(Print):
     """Writeln statement, Write with a new line at the end"""
     def __init__(self, lexspan, elements):
         Print.__init__(self, lexspan, elements)
-        # self.type = "writeln"
 
 
 class If(Statement):
     """If statement"""
     def __init__(self, lexspan, condition, then_st, else_st=None):
-        # self.type = "if"
         self.lexspan = lexspan
         self.condition = condition
         self.then_st = then_st
@@ -302,7 +294,6 @@ class For(Statement):
 class While(Statement):
     """Declaracion while, toma una expresion"""
     def __init__(self, lexspan, condition, statement):
-        # self.type = "while"
         self.lexspan = lexspan
         self.condition = condition
         self.statement = statement
@@ -406,7 +397,6 @@ class Expression: pass
 class Variable(Expression):
     """Class to define a variable"""
     def __init__(self, lexspan, name):
-        # self.type = "var"
         self.lexspan = lexspan
         self.name = name
 
@@ -447,7 +437,6 @@ class Variable(Expression):
 class Int(Expression):
     """Clase a definir un entero"""
     def __init__(self, lexspan, value):
-        # self.type = "int"
         self.lexspan = lexspan
         self.value = value
 
@@ -468,7 +457,6 @@ class Int(Expression):
 class Bool(Expression):
     """Clase a definir un booleano"""
     def __init__(self, lexspan, value):
-        # self.type = "bool"
         self.lexspan = lexspan
         self.value = value
 
@@ -488,7 +476,6 @@ class Bool(Expression):
 class Set(Expression):
     """Clase a definir un conjunto"""
     def __init__(self, lexspan, values):
-        # self.type = "set"
         self.lexspan = lexspan
         if values is not None:
             self.values = values
@@ -527,7 +514,6 @@ def error_unsuported_set(lexspan, type):
 class String(Expression):
     """Clase a definir una cadena de caracteres"""
     def __init__(self, lexspan, value):
-        # self.type = "string"
         self.lexspan = lexspan
         self.value = value
 
@@ -584,7 +570,6 @@ def check_bin(lexspan, operator, left, right, types):
 class Binary(Expression):
     """Expresion binaria"""
     def __init__(self, lexspan, operator, left, right):
-        # self.type = "binary: "
         self.lexspan = lexspan
         self.operator = operator
         self.left = left
@@ -613,7 +598,6 @@ class Binary(Expression):
 class Plus(Binary):
     """Binary expressions with a '+'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "+"
         Binary.__init__(self, lexspan, "+", left, right)
 
     def check(self):
@@ -627,7 +611,6 @@ class Plus(Binary):
 class Minus(Binary):
     """Binary expressions with a '-'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "-"
         Binary.__init__(self, lexspan, "-", left, right)
 
     def check(self):
@@ -642,7 +625,6 @@ class Minus(Binary):
 class Times(Binary):
     """Binary expressions with a '*'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "*"
         Binary.__init__(self, lexspan, "*", left, right)
 
     def check(self):
@@ -656,7 +638,6 @@ class Times(Binary):
 class Divide(Binary):
     """Binary expressions with a '/'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "/"
         Binary.__init__(self, lexspan, "/", left, right)
 
     def check(self):
@@ -670,7 +651,6 @@ class Divide(Binary):
 class Module(Binary):
     """Binary expressions with a '%'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "%"
         Binary.__init__(self, lexspan, "%", left, right)
 
     def check(self):
@@ -687,7 +667,6 @@ class Module(Binary):
 class Setplus(Binary):
     """Binary expressions with a '<+>'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "<->"
         Binary.__init__(self, lexspan, "<+>", left, right)
 
     def check(self):
@@ -701,7 +680,6 @@ class Setplus(Binary):
 class Setminus(Binary):
     """Binary expressions with a '<->'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "<->"
         Binary.__init__(self, lexspan, "<->", left, right)
 
     def check(self):
@@ -715,7 +693,6 @@ class Setminus(Binary):
 class Settimes(Binary):
     """Binary expressions with a '<*>'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "<*>"
         Binary.__init__(self, lexspan, "<*>", left, right)
 
     def check(self):
@@ -730,7 +707,6 @@ class Settimes(Binary):
 class Setmod(Binary):
     """Binary expressions with a '<%>'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "<%>"
         Binary.__init__(self, lexspan, "<%>", left, right)
 
     def check(self):
@@ -744,7 +720,6 @@ class Setmod(Binary):
 class Setdivition(Binary):
     """Binary expressions with a '</>'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "</>"
         Binary.__init__(self, lexspan, "</>", left, right)
 
     def check(self):
@@ -760,7 +735,6 @@ class Setdivition(Binary):
 class Setintersection(Binary):
     """Binary expressions with a '><'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "><"
         Binary.__init__(self, lexspan, "><", left, right)
 
     def check(self):
@@ -789,7 +763,6 @@ class Setunion(Binary):
 class Setdifference(Binary):
     """Binary expressions with a '/'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "<>"
         Binary.__init__(self, lexspan, "/", left, right)
 
     def check(self):
@@ -806,7 +779,6 @@ class Setdifference(Binary):
 class Or(Binary):
     """Binary expressions with a 'or'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "or"
         Binary.__init__(self, lexspan, "or", left, right)
 
     def check(self):
@@ -821,7 +793,6 @@ class Or(Binary):
 class And(Binary):
     """Binary expressions with a 'and'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "and"
         Binary.__init__(self, lexspan, "and", left, right)
 
     def check(self):
@@ -836,7 +807,6 @@ class And(Binary):
 class Less(Binary):
     """Binary expressions with a '<'"""
     def __init__(self, lexspan, left, right):
-        # self.type = "<"
         Binary.__init__(self, lexspan, "<", left, right)
 
     def check(self):
@@ -850,7 +820,6 @@ class Less(Binary):
 class LessEq(Binary):
     """Binary expressions with a '<='"""
     def __init__(self, lexspan, left, right):
-        # self.type = "<="
         Binary.__init__(self, lexspan, "<=", left, right)
 
     def check(self):
@@ -865,7 +834,6 @@ class LessEq(Binary):
 class Great(Binary):
     """Binary expressions with a '>'"""
     def __init__(self, lexspan, left, right):
-        # self.type = ">"
         Binary.__init__(self, lexspan, ">", left, right)
 
     def check(self):
@@ -879,7 +847,6 @@ class Great(Binary):
 class GreatEq(Binary):
     """Binary expressions with a '>='"""
     def __init__(self, lexspan, left, right):
-        # self.type = ">="
         Binary.__init__(self, lexspan, ">=", left, right)
 
     def check(self):
@@ -893,7 +860,6 @@ class GreatEq(Binary):
 class Equal(Binary):
     """Binary expressions with a '=='"""
     def __init__(self, lexspan, left, right):
-        # self.type = "=="
         Binary.__init__(self, lexspan, "==", left, right)
 
     def check(self):
@@ -908,7 +874,6 @@ class Equal(Binary):
 class Unequal(Binary):
     """Binary expressions with a '/='"""
     def __init__(self, lexspan, left, right):
-        # self.type = "/="
         Binary.__init__(self, lexspan, "/=", left, right)
 
     def check(self):
@@ -926,7 +891,6 @@ class Unequal(Binary):
 class Setbelong(Binary):
     """Binary expressions with a '>>'"""
     def __init__(self, lexspan, left, right):
-        # self.type = ">>"
         Binary.__init__(self, lexspan, ">>", left, right)
 
     def check(self):
@@ -969,7 +933,6 @@ def check_unary(lexspan, operator, operand, types):
 class Unary(Expression):
     """Expresion unaria"""
     def __init__(self, lexspan, operator, operand):
-        # self.type = "unary: "
         self.lexspan = lexspan
         self.operator = operator
         self.operand = operand
@@ -986,7 +949,6 @@ class Unary(Expression):
 class UMinus(Unary):
     """Unary expressions with a '-'"""
     def __init__(self, lexspan, operand):
-        # self.type = "-"
         Unary.__init__(self, lexspan, "-", operand)
 
     def check(self):
@@ -1034,7 +996,6 @@ class SetLen(Unary):
 class Not(Unary):
     """Unary expressions with a 'not'"""
     def __init__(self, lexspan, operand):
-        # self.type = "not"
         Unary.__init__(self, lexspan, "not", operand)
 
     def check(self):

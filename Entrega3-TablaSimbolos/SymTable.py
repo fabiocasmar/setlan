@@ -8,13 +8,13 @@
 ####
 
 
-# To set indentation automatically
+# Obtener identacion
 def indent(level):
     return "    " * level
 
 
 class SymTable(object):
-    """Representation of a SymTable in the Symbol Table."""
+    """Representacion de una tabla de simbolos en una tabla de simbolos"""
     def __init__(self):
         self.scope = {}
         self.outer = None
@@ -102,7 +102,7 @@ class SymTable(object):
 
 
 class Symbol(object):
-    """A Symbol of the Symbol Table"""
+    """Simbolos de la tabla"""
     def __init__(self, lexspan, name, data_type, value=None):
         super(Symbol, self).__init__()
         self.lexspan = lexspan

@@ -226,7 +226,7 @@ def t_NUMBER(token):
 
 def t_ID(token):
     r'\w[\w\d]*'
-    # If there are no reserved words that match, it's an ID
+    # Si no existo una palabra reservada que coincida, es un ID
     token.type = RESERVED.get(token.value, 'ID')
     token.endlexpos = token.lexpos + len(token.value) - 1
     return token
@@ -308,7 +308,7 @@ def t_SETBELONG(token):
 t_ignore = " \t"
 t_ignore_COMMENT = r'\#.*'
 
-# The only new line character considered is \n
+# El unico caracter de nueva linea conciderado es \n
 def t_newline(token):
     r'\n+'
     token.lexer.lineno += token.value.count('\n')
@@ -316,7 +316,6 @@ def t_newline(token):
 
 # To find the column number of the current line
 def find_column(text, lexpos):
-    #print lexpos
     last_new = text.rfind('\n', 0, lexpos)
     if last_new < 0:
         last_new = -1

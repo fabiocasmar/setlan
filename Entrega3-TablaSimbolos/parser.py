@@ -11,8 +11,7 @@ from lexer import tokens, lexer_error, find_column, lexer
 from ast import *
 
 
-# To get position span for a specified symbol,
-# line and column for start and end
+# Obtener margen de posicion de un simbolo
 def span(symbol, pos):
     if isinstance(symbol[pos], (int, str)):
         lexspan = symbol.lexspan(pos)
@@ -65,8 +64,6 @@ def p_statement_block(symbol):
         _, end = span(symbol, 3)
         symbol[0] = Block((start, end), symbol[2])
     else:
-        # # symbol[0] = Block(symbol[4], symbol[3])
-        # symbol[0] = Block(symbol[5])
         start, _ = span(symbol, 1)
         _, end = span(symbol, 6)
         symbol[0] = Block((start, end), symbol[5], symbol[3])
@@ -97,7 +94,6 @@ def p_statement_declare_list(symbol):
             else:
                 scope.insert(var, symbol[1])
         symbol[0] = scope
-        # symbol[0] = [(symbol[2], symbol[1])]
     else:
         scope = symbol[1]
         for var in symbol[3]:
@@ -106,7 +102,6 @@ def p_statement_declare_list(symbol):
             else:
                 scope.insert(var, symbol[2])
         symbol[0] = scope
-        # symbol[0] = symbol[1] + [(symbol[3], symbol[2])]
 
 
 # Regla para crear una lista con el nombre de las variables
@@ -158,7 +153,6 @@ def p_statement_print(symbol):
         symbol[0] = Print((start, end), symbol[2])
     else:
         symbol[0] = PrintLn((start, end), symbol[2])
-    # revisar si cambio algo en su WRITE
 
 
 # Lista de elementos a imprimir con la funcion 'print' 
@@ -170,17 +164,7 @@ def p_statement_comma_list(symbol):
     else:
         symbol[0] = symbol[1] + [symbol[3]]
 
-# # A string is a valid printable
-#def p_print_string_literal(symbol):
-#    """printable : STRING"""
-#    symbol[0] = String(span(symbol, 1), symbol[1])
-# REVISAR
 
-# An expression is a valid printable
-#def p_exp_print(symbol):
-#    """printable : expression"""
-#    symbol[0] = symbol[1]
-# REVISAR
 
 ############################     CONDICIONALES      #############################
 
@@ -193,12 +177,10 @@ def p_statement_if(symbol):
         start, _ = span(symbol, 1)
         _, end = span(symbol, 5)
         symbol[0] = If((start, end), symbol[3], symbol[5])
-        # symbol[0] = If(symbol[3], symbol[5])
     else:
         start, _ = span(symbol, 1)
         _, end = span(symbol, 7)
         symbol[0] = If((start, end), symbol[3], symbol[5], symbol[7])
-        # symbol[0] = If(symbol[3], symbol[5], symbol[7])
 
 
 ###############################     LAZOS      #################################
@@ -208,7 +190,6 @@ def p_statement_if(symbol):
 def p_statement_for(symbol):
     """statement : FOR ID MAX expression DO statement
                  | FOR ID MIN expression DO statement"""
-    # symbol[0] = For(Variable(symbol[2]), symbol[4], symbol[6], symbol[3])
     variable = Variable(span(symbol, 2), symbol[2])
     start, _ = span(symbol, 1)
     _, end = span(symbol, 6)
@@ -226,7 +207,6 @@ def p_statement_while(symbol):
 # luego evalua la expresion en el while, si se cumple vuelve al bloque
 def p_statement_repeat(symbol):
     "statement : REPEAT statement WHILE OPENPAREN expression CLOSEPAREN "
-    # symbol[0] = Repeat(symbol[2], symbol[5])
     start, _ = span(symbol, 1)
     _, end = span(symbol, 6)
     symbol[0] = Repeat((start, end), symbol[2], symbol[5])
@@ -238,7 +218,6 @@ def p_statement_repeat_while(symbol):
     start, _ = span(symbol, 1)
     _, end = span(symbol, 8)
     symbol[0] = RepeatWhile((start, end), symbol[2], symbol[5], symbol[8])
-    # symbol[0] = RepeatWhile(symbol[2], symbol[5], symbol[8])
 
 
 ###############################################################################
@@ -291,7 +270,6 @@ def p_exp_bool_literal(symbol):
 def p_exp_set_literal(symbol):
     """expression : OPENCURLY comma_list CLOSECURLY
                   | OPENCURLY CLOSECURLY """
-    # symbol[0] = Set(symbol[2])
     if len(symbol) == 4:
         start, _ = span(symbol, 1)
         _, end = span(symbol, 3)
