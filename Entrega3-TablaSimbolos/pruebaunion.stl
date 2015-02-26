@@ -6,10 +6,42 @@ program {
     bool e, f; # inicializan en false
   in
 
-  a = 10;
-  scan b;
-  c = {1,2,3};
-  d = {2,3,4};
-  z = c+d;
+  if (true){
+    using
+      int  ah, bjd; # inicializan en 0
+      set  c, d; # inicializan en {}
+      set  z;
+      bool e, f; # inicializan en false
+    in
+     a = a;
+  };
+
+repeat{
+  using
+      int  jajajaj, lolol; # inicializan en 0
+    in
+}
+while (a > 0) do
+print a;
+    
+while (true) do {
+  using
+      int  usb, ucv; # inicializan en 0
+  in
+  a = a +1;
+};
+
+#################EXPLOTAN###########
+
+repeat{
+  scan e;
+} while (true) ;
+
+repeat
+  scan e
+while (true);
+
+##############EXPLOTAN###############
+
 
 }
