@@ -353,12 +353,13 @@ class Repeat(Statement):
         boolean = True
         set_scope(self.condition, self.scope)
         set_scope(self.statement, self.scope)
+        exp_type = self.condition.check()
         if self.statement.check() is False:
             boolean = False
         if not error_invalid_expression(exp_type, self.condition,
                                      "'repeat' condition", 'BOOL'):
             boolean = False
-        exp_type = self.condition.check()
+        
         return boolean
 
 class RepeatWhile(Statement):
@@ -396,6 +397,8 @@ class RepeatWhile(Statement):
         if self.statement2.check() is False:
             boolean = False
         return boolean
+
+
 
 class Expression: pass
 
