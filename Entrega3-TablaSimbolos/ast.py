@@ -269,7 +269,6 @@ class For(Statement):
         self.statement = statement
         self.dire = dire
         self.scope = scope
-        self.scope.insert(self.variable, 'INT')
 
     def print_tree(self, level):
         string = indent(level) + "FOR\n"
@@ -286,6 +285,7 @@ class For(Statement):
     def check(self):
         boolean = True
         set_scope(self.in_set, self.scope)
+        self.scope.insert(self.variable, 'INT')
         if(self.in_set.check() != "SET"):
             message = "ERROR: unsupported type '%s' for scan "
             message += "from line %d, column %d"

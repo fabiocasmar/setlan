@@ -11,12 +11,10 @@ program {
     y = {a, b, b + a, b - a, b * a, b / a, b % a};
     x = x++y;
     # esto se asocia: (a <+> y) ++ (b <+> x) ++ y ++ x
- for i max a <+> y ++ b <+> x ++ y ++ x do  
-	x = x+1;
-     print i, ", "
-    ;
-
-    print "done.";
+    for i max  x do { 
+     print i, ", ";
+};
+     print "done.";
 }
 
 #PROGRAM
