@@ -244,8 +244,8 @@ precedence = (
     ("left",'SETINTERSECTION'),
     ("right",'SETMAX','SETMIN','SETLEN'),
     # int sobre conjunto
-    ("left", 'SETPLUS','SETMINUS'),
-    ("left", 'SETTIMES','SETDIVITION','SETMOD'),
+    ("nonassoc", 'SETPLUS','SETMINUS'),
+    ("nonassoc", 'SETTIMES','SETDIVITION','SETMOD'),
     # int
     ("left", 'PLUS', 'MINUS'),
     ("left", 'TIMES', 'DIVIDE', 'MODULE'), 
