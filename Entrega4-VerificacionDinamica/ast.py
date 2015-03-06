@@ -8,7 +8,8 @@
 ####
 
 from SymTable import SymTable, indent
-
+from sys import exit, stdout
+import re
 
 static_error = []
 
@@ -37,6 +38,9 @@ class Program:
     def check(self):
         set_scope(self.statement, self.scope)
         return self.statement.check()
+
+    def execute(self):
+        self.statement.execute()
 
 # Para heredar
 class Statement: pass
@@ -97,6 +101,11 @@ class Assign(Statement):
 
         return True
 
+    def execute(self):
+        value = self.expression.evaluate()
+        data_type = self.expression.check()
+        self.scope.update(self.variable, data_type, value)
+
 class Block(Statement):
     """Declaracion de bloque"""
     def __init__(self, lexspan, statements, scope=SymTable()):
@@ -119,6 +128,11 @@ class Block(Statement):
         string += "END"
 
         return string
+
+    def execute(self):
+        for stat in self.statements:
+            stat.execute()
+
 
     def print_symtab(self, level):
         if self.scope:
@@ -166,6 +180,41 @@ class Scan(Statement):
         else:
             return True
 
+    def execute(self):
+        def ask_int():
+            raw = raw_input()
+            match = re.match(r'^\s*-?\s*\d+\s*$', raw)
+            if match:
+                value = int(match.group())
+                if not (-2147483648 <= value <= 2147483648):
+                    print "\nexpecting an int value, overflow, try again."
+                    return ask_int()
+                return value
+            else:
+                print "\nexpecting an int value, try again."
+                return ask_int()
+
+        def ask_bool():
+            raw = raw_input()
+            raw = raw.strip(' \t\n\r')
+            raw = raw.lower()
+            if raw == 'true' or raw == 'false':
+                return eval(raw.title())
+            else:
+                print "\nexpecting a bool value, try again."
+                return ask_bool()
+
+        symbol = self.scope.find(self.variable)
+        if symbol.data_type == 'INT':
+            value = ask_int()
+        else:
+            value = ask_bool()
+
+        self.scope.update(self.variable, symbol.data_type, value)
+
+
+
+
 class Print(Statement):
     """Write statement, for printing in standard output"""
     def __init__(self, lexspan, elements):
@@ -195,11 +244,32 @@ class Print(Statement):
                 boolean = False
         return boolean
 
+    def execute(self):
+        for elem in self.elements:
+            intrp = elem.evaluate()
+            if isinstance(intrp, bool):
+                stdout.write(str(intrp).lower())
+            elif isinstance(intrp, list):
+                print isinstance(intrp[1],int)
+                intrp.sort()
+                out = "{"
+                for i in range(0,len(intrp)):
+                    out += str(intrp[i])
+                    if i != len(intrp)-1: out += ","
+                out += "}"
+                stdout.write(str(out))
+            else:
+                stdout.write(str(eval(str(intrp))))
+
 
 class PrintLn(Print):
     """Writeln statement, Write with a new line at the end"""
     def __init__(self, lexspan, elements):
         Print.__init__(self, lexspan, elements)
+
+    def execute(self):
+        Print.execute(self)
+        stdout.write('\n')
 
 
 class If(Statement):
@@ -209,7 +279,7 @@ class If(Statement):
         self.condition = condition
         self.then_st = then_st
         self.else_st = else_st
-
+        self.sym_table = None
 
     def print_tree(self, level):
         string = indent(level) + "IF\n"
@@ -252,6 +322,13 @@ class If(Statement):
 
         return boolean
 
+    def execute(self):
+        condition = self.condition.evaluate()
+        if condition:
+            self.then_st.execute()
+        elif self.else_st:
+            self.else_st.execute()
+
 class For(Statement):
     """Declaracion for, funciona sobre conjuntos"""
     def __init__(self, lexspan, variable, in_set, statement, dire,scope=SymTable()):
@@ -261,6 +338,7 @@ class For(Statement):
         self.statement = statement
         self.dire = dire
         self.scope = scope
+        self.sym_table = None
 
     def print_tree(self, level):
         string = indent(level) + "FOR\n"
@@ -279,7 +357,7 @@ class For(Statement):
         set_scope(self.in_set, self.scope)
         self.scope.insert(self.variable, 'INT')
         if(self.in_set.check() != "SET"):
-            message = "ERROR: unsupported type '%s' for scan "
+            message = "ERROR: unsupported type '%s' for For "
             message += "from line %d, column %d"
             s_lin, s_col = self.lexspan[1]
             data = str(self.variable), s_lin, s_col
@@ -290,6 +368,14 @@ class For(Statement):
             boolean = False
         return boolean
 
+    def execute(self):
+        t_set = self.in_set.evaluate()
+        if self.dire == 'MAX' : sorted(t_set)
+        else: sorted(t_set,reverse = True)
+        for val in t_set:
+            self.statement.sym_table.update(self.variable, 'INT', val)
+            self.statement.execute()
+
 
 class While(Statement):
     """Declaracion while, toma una expresion"""
@@ -297,6 +383,7 @@ class While(Statement):
         self.lexspan = lexspan
         self.condition = condition
         self.statement = statement
+        self.sym_table = None
 
     def print_tree(self, level):
         string = indent(level) + "WHILE\n"
@@ -321,6 +408,10 @@ class While(Statement):
         if self.statement.check() is False:
             boolean = False
         return boolean
+
+    def execute(self):
+        while self.condition.evaluate():
+            self.statement.execute()
 
 
 class Repeat(Statement):
@@ -352,6 +443,11 @@ class Repeat(Statement):
             boolean = False
         
         return boolean
+
+    def execute(self):
+        self.statement.execute()
+        while self.condition.evaluate():
+            self.statement.execute()
 
 class RepeatWhile(Statement):
     """Declaracion repeat-while, toma una expresion"""
@@ -389,6 +485,11 @@ class RepeatWhile(Statement):
             boolean = False
         return boolean
 
+    def execute(self):
+        self.statement.execute()
+        while self.condition.evaluate():
+            self.statement2.execute()
+            self.statement.execute()
 
 
 class Expression: pass
@@ -399,6 +500,7 @@ class Variable(Expression):
     def __init__(self, lexspan, name):
         self.lexspan = lexspan
         self.name = name
+        self.sym_table = None
 
     def __eq__(self, other):
         return self.name == other.name
@@ -433,6 +535,18 @@ class Variable(Expression):
             static_error.append(message % data)
             return None
 
+    def evaluate(self):
+        symbol = self.scope.find(self)
+        # if not symbol.initialized:
+        #     message = "ERROR: variable '%s' not initialized"
+        #     message += " at line %d, column %d"
+        #     line, column = self.lexspan[0]
+        #     data = self.name, line, column
+        #     print message % data
+        #     exit()
+
+        return symbol.value
+
 
 class Int(Expression):
     """Clase a definir un entero"""
@@ -453,6 +567,9 @@ class Int(Expression):
     def check(self):
         return 'INT'
 
+    def evaluate(self):
+        return self.value
+
 
 class Bool(Expression):
     """Clase a definir un booleano"""
@@ -472,6 +589,9 @@ class Bool(Expression):
 
     def check(self):
         return 'BOOL'
+
+    def evaluate(self):
+        return eval(self.value.title())
 
 class Set(Expression):
     """Clase a definir un conjunto"""
@@ -503,6 +623,8 @@ class Set(Expression):
                     error_unsuported_set(self.lexspan,i.check())
             return "SET"
 
+    def evaluate(self):
+        return self.values
 
 def error_unsuported_set(lexspan, type):
     message = "ERROR: unsupported type '%s' for interior of set "
@@ -516,6 +638,7 @@ class String(Expression):
     def __init__(self, lexspan, value):
         self.lexspan = lexspan
         self.value = value
+        self.sym_table = None
 
     def __str__(self):
         return self.value
@@ -530,6 +653,9 @@ class String(Expression):
         string = ""
         return string
 
+    def evaluate(self):
+        return self.value
+
 def error_unsuported_binary(lexspan, operator, left, right):
     message = "ERROR: unsupported operator '%s' for types '%s' and '%s' "
     message += "from line %d, column %d to line %d, column %d"
@@ -537,6 +663,15 @@ def error_unsuported_binary(lexspan, operator, left, right):
     e_lin, e_col = lexspan[1]
     data = str(operator), str(left), str(right), s_lin, s_col, e_lin, e_col
     static_error.append(message % data)
+
+def error_overflow(lexspan, operator):
+    message = "ERROR: overflow in '%s' operation, "
+    message += "from line %d, column %d to line %d, column %d"
+    s_lin, s_col = lexspan[0]
+    e_lin, e_col = lexspan[1]
+    data = str(operator), s_lin, s_col, e_lin, e_col
+    print '\n\n', message % data
+    exit()
 
 
 # Checks that the left and right operator has any of the accepted layouts
@@ -608,6 +743,17 @@ class Plus(Binary):
         type_tuples = [('INT', 'INT'), ('SET', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+
+        if self.check() == 'INT':
+            value = left + right
+            if not (-2147483648 <= value <= 2147483648):
+                error_overflow(self.lexspan, self.operator)
+            return value
+
+
 class Minus(Binary):
     """Binary expressions with a '-'"""
     def __init__(self, lexspan, left, right):
@@ -621,6 +767,15 @@ class Minus(Binary):
         type_tuples = [('INT', 'INT')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        value = left - right
+
+        if not (-2147483648 <= value <= 2147483648):
+            error_overflow(self.lexspan, self.operator)
+
+        return value
 
 class Times(Binary):
     """Binary expressions with a '*'"""
@@ -635,6 +790,15 @@ class Times(Binary):
         type_tuples = [('INT', 'INT'), ('SET', 'INT', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        if self.check() == 'INT':
+            value = left * right
+            if not (-2147483648 <= value <= 2147483648):
+                error_overflow(self.lexspan, self.operator)
+            return value
+
 class Divide(Binary):
     """Binary expressions with a '/'"""
     def __init__(self, lexspan, left, right):
@@ -648,6 +812,19 @@ class Divide(Binary):
         type_tuples = [('INT', 'INT')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+
+        if right == 0:
+            error_division_by_zero(self.lexspan, self.operator)
+
+        value = left / right
+        if not (-2147483648 <= value <= 2147483648):
+            error_overflow(self.lexspan, self.operator)
+
+        return value
+
 class Module(Binary):
     """Binary expressions with a '%'"""
     def __init__(self, lexspan, left, right):
@@ -660,6 +837,19 @@ class Module(Binary):
         right = self.right.check()
         type_tuples = [('INT', 'INT')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+
+        if right == 0:
+            error_division_by_zero(self.lexspan, self.operator)
+
+        value = left % right
+        if not (-2147483648 <= value <= 2147483648):
+            error_overflow(self.lexspan, self.operator)
+
+        return value
 
 ######        Operadores sobre Conjuntos       ######
 
@@ -677,6 +867,14 @@ class Setplus(Binary):
         type_tuples = [('INT', 'SET')]
         check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        for i in range(0,len(right)):
+            right[i] += left
+        return right
+
+
+
+
 class Setminus(Binary):
     """Binary expressions with a '<->'"""
     def __init__(self, lexspan, left, right):
@@ -689,6 +887,11 @@ class Setminus(Binary):
         right = self.right.check()
         type_tuples = [('INT', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+    def evaluate(self):
+        for i in range(0,len(right)):
+            right[i] -= left
+        return right
 
 class Settimes(Binary):
     """Binary expressions with a '<*>'"""
@@ -703,6 +906,10 @@ class Settimes(Binary):
         type_tuples = [('INT', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        for i in range(0,len(right)):
+            right[i] *= left
+        return right
 
 class Setmod(Binary):
     """Binary expressions with a '<%>'"""
@@ -717,6 +924,11 @@ class Setmod(Binary):
         type_tuples = [('INT', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        for i in range(0,len(right)):
+            right[i] %= left
+        return right
+
 class Setdivition(Binary):
     """Binary expressions with a '</>'"""
     def __init__(self, lexspan, left, right):
@@ -729,6 +941,15 @@ class Setdivition(Binary):
         right = self.right.check()
         type_tuples = [('INT', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+    def evaluate(self):
+
+        if left == 0:
+            error_division_by_zero(self.lexspan, self.operator)
+
+        for i in range(0,len(right)):
+            right[i] /= left
+        return right
 
 ######        Cojunto sobre Conjunto       ######
 
@@ -744,6 +965,9 @@ class Setintersection(Binary):
         right = self.right.check()
         type_tuples = [('SET', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+    
+        
 
 class Setunion(Binary):
     """Binary expressions with a '++'"""
@@ -789,6 +1013,10 @@ class Or(Binary):
         type_tuples = [('BOOL', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        return left or right
 
 class And(Binary):
     """Binary expressions with a 'and'"""
@@ -803,6 +1031,10 @@ class And(Binary):
         type_tuples = [('BOOL', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        return left and right
 
 class Less(Binary):
     """Binary expressions with a '<'"""
@@ -814,8 +1046,14 @@ class Less(Binary):
         set_scope(self.right, self.scope)
         left = self.left.check()
         right = self.right.check()
-        type_tuples = [('INT', 'INT', 'BOOL'), ('SET', 'SET', 'BOOL')]
+        type_tuples = [('INT', 'INT', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        return left < right
+        
 
 class LessEq(Binary):
     """Binary expressions with a '<='"""
@@ -827,8 +1065,14 @@ class LessEq(Binary):
         set_scope(self.right, self.scope)
         left = self.left.check()
         right = self.right.check()
-        type_tuples = [('INT', 'INT', 'BOOL'), ('SET', 'SET', 'BOOL')]
+        type_tuples = [('INT', 'INT', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        return left <= right
 
 
 class Great(Binary):
@@ -841,8 +1085,15 @@ class Great(Binary):
         set_scope(self.right, self.scope)
         left = self.left.check()
         right = self.right.check()
-        type_tuples = [('INT', 'INT', 'BOOL'), ('SET', 'SET', 'BOOL')]
+        type_tuples = [('INT', 'INT', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        return left > right
+        
 
 class GreatEq(Binary):
     """Binary expressions with a '>='"""
@@ -854,8 +1105,14 @@ class GreatEq(Binary):
         set_scope(self.right, self.scope)
         left = self.left.check()
         right = self.right.check()
-        type_tuples = [('INT', 'INT', 'BOOL'), ('SET', 'SET', 'BOOL')]
+        type_tuples = [('INT', 'INT', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        return left >= right
+
 
 class Equal(Binary):
     """Binary expressions with a '=='"""
@@ -871,6 +1128,11 @@ class Equal(Binary):
                        ('SET', 'SET', 'BOOL'), ('BOOL', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        return left == right
+
 class Unequal(Binary):
     """Binary expressions with a '/='"""
     def __init__(self, lexspan, left, right):
@@ -885,13 +1147,18 @@ class Unequal(Binary):
                        ('SET', 'SET', 'BOOL'), ('BOOL', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+        return left != right
+
 ######        Operadores Booleanos sobre Conjuntos     ######
 
 
 class Setbelong(Binary):
-    """Binary expressions with a '>>'"""
+    """Binary expressions with a '@'"""
     def __init__(self, lexspan, left, right):
-        Binary.__init__(self, lexspan, ">>", left, right)
+        Binary.__init__(self, lexspan, "@", left, right)
 
     def check(self):
         set_scope(self.left, self.scope)
@@ -901,6 +1168,12 @@ class Setbelong(Binary):
         type_tuples = [('INT', 'SET', 'BOOL')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        left = self.left.evaluate()
+        t_set = self.right.evaluate()
+        for i in t_set:
+            if i == left: return True
+        return False
 ###############################################################################
 
 def error_unsuported_unary(lexspan, operator, operand):
@@ -910,6 +1183,15 @@ def error_unsuported_unary(lexspan, operator, operand):
     e_lin, e_col = lexspan[1]
     data = str(operator), str(operand), s_lin, s_col, e_lin, e_col
     static_error.append(message % data)
+
+def error_division_by_zero(lexspan, operator):
+    message = "ERROR: division by zero with in '%s' operation, "
+    message += "from line %d, column %d to line %d, column %d"
+    s_lin, s_col = lexspan[0]
+    e_lin, e_col = lexspan[1]
+    data = str(operator), s_lin, s_col, e_lin, e_col
+    print '\n\n', message % data
+    exit()
 
 
 def check_unary(lexspan, operator, operand, types):
@@ -957,6 +1239,10 @@ class UMinus(Unary):
         types = [('INT',)]
         return check_unary(self.lexspan, self.operator, operand, types)
 
+    def evaluate(self):
+        operand = self.operand.evaluate()
+        return operand * -1
+
 ##### Operadores Unarios sobre Conjuntos ######
 
 class Setmax(Unary):
@@ -993,6 +1279,10 @@ class SetLen(Unary):
         types = [('SET','INT')]
         return check_unary(self.lexspan, self.operator, operand, types)
 
+    def evaluate(self):
+        t_set = self.operand.evaluate()
+        return len(t_set)
+
 class Not(Unary):
     """Unary expressions with a 'not'"""
     def __init__(self, lexspan, operand):
@@ -1003,3 +1293,7 @@ class Not(Unary):
         operand = self.operand.check()
         types = [('BOOL',)]
         return check_unary(self.lexspan, self.operator, operand, types)
+
+    def evaluate(self):
+        operand = self.operand.evaluate()
+        return not operand

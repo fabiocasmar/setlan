@@ -31,32 +31,32 @@ def main(argv=None):
         print "ERROR: Must give an input file"
         return
 
-    i = 1
-    token_salida = 0
-    arbol_salida = 0
-    tabla_salida = 0
-    while i <= len(argv)-2:
-        if(argv[i]=="-t"):
-            token_salida = 1
-        if(argv[i]=="-a"):
-            arbol_salida = 1
-        if(argv[i]=="-s"):
-            tabla_salida = 1
-        i=i+1 
+    # i = 1
+    # token_salida = 0
+    # arbol_salida = 0
+    # tabla_salida = 0
+    # while i <= len(argv)-2:
+    #     if(argv[i]=="-t"):
+    #         token_salida = 1
+    #     if(argv[i]=="-a"):
+    #         arbol_salida = 1
+    #     if(argv[i]=="-s"):
+    #         tabla_salida = 1
+    #     i=i+1 
 
     ast = parser.parsing(file_string)
 
-    if  token_salida:
-        tokens_list = lexer.lexing(file_string)
-        print "Token List:"
-        for tok in tokens_list:
-            print 'Token' + str(tok.type),
-            if str(tok.type) == 'ID':
-                print ': "' + tok.value + '"',
-            elif str(tok.type) == 'String':
-                print ': ' + tok.value,
-            print '(Línea ' + str(tok.lineno) + ',',
-            print 'Columna ' + str(find_column(file_string,tok.lexer.lexpos)) + ')'
+    # if  token_salida:
+    #     tokens_list = lexer.lexing(file_string)
+    #     print "Token List:"
+    #     for tok in tokens_list:
+    #         print 'Token' + str(tok.type),
+    #         if str(tok.type) == 'ID':
+    #             print ': "' + tok.value + '"',
+    #         elif str(tok.type) == 'String':
+    #             print ': ' + tok.value,
+    #         print '(Línea ' + str(tok.lineno) + ',',
+    #         print 'Columna ' + str(find_column(file_string,tok.lexer.lexpos)) + ')'
 
 
     # Check for Overflow or Unexpected character errors
@@ -74,14 +74,19 @@ def main(argv=None):
     elif parser.static_error:
         for error in parser.static_error:
             print error
+    # else:
+    #     if arbol_salida:
+    #         print "Syntactic Tree:"
+    #         print ast 
+    #         print "\n"
+    #     if tabla_salida:
+    #         print ast.print_symtab()
+    #         print "\n"
     else:
-        if arbol_salida:
-            print "Syntactic Tree:"
-            print ast 
-            print "\n"
-        if tabla_salida:
-            print ast.print_symtab()
-            print "\n"
+        ast.execute()
+
+    return ast
+
     exit(0)
 
 

@@ -1,0 +1,21 @@
+program {
+  using
+    int  a, b; # inicializan en 0
+    set  c, d; # inicializan en {}
+    set  z;
+    bool e, f; # inicializan en false
+  in
+
+  a = -4;
+  b = 4;
+
+  if (a /= not b){
+    println "hola";
+  }
+  else if (a <= b){
+    println ":(";
+  };
+ 
+  
+
+}
