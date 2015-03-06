@@ -1,0 +1,7 @@
+
+
+* No se pueden ordenar los sets, parece ser error en la formo como los guarda la tabla de simbolos.
+* Probar los tipos de lazos.
+* Probar expresiones complejas con asociatividad y parentesis.
+* Programar las uniones e intersecciones de los sets.
+* Programar las operaciones INT x SET 
