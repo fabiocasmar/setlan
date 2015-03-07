@@ -213,7 +213,8 @@ class Scan(Statement):
         self.scope.update(self.variable, symbol.data_type, value)
 
 
-
+def getKey(item):
+    return item.evaluate()
 
 class Print(Statement):
     """Write statement, for printing in standard output"""
@@ -250,8 +251,7 @@ class Print(Statement):
             if isinstance(intrp, bool):
                 stdout.write(str(intrp).lower())
             elif isinstance(intrp, list):
-                print isinstance(intrp[1],int)
-                intrp.sort()
+                intrp.sort(key = getKey)
                 out = "{"
                 for i in range(0,len(intrp)):
                     out += str(intrp[i])

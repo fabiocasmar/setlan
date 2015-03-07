@@ -9,13 +9,14 @@ program {
   a = -4;
   b = 4;
 
-  if (a /= not b){
+  if (a /= b){
     println "hola";
   }
   else if (a <= b){
     println ":(";
   };
  
-  
+  z = {2,3,1,5,4};
+  println z;
 
 }
