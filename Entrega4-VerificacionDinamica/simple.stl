@@ -1,8 +1,8 @@
 program {
   using
-    int  a, b; # inicializan en 0
+    int  a, b,x; # inicializan en 0
     set  c, d; # inicializan en {}
-    set  z;
+    set  z,op;
     bool e, f; # inicializan en false
   in
 
@@ -16,7 +16,14 @@ program {
     println ":(";
   };
  
-  z = {2,3,1,5,4};
-  println z;
+  x = 1;
+  z = {1,2,5,4};
+  println "z  : ",z;
+  println "op : ",op;
+
+  for i min z do {
+ println i;
+ };
+ println z;
 
 }
