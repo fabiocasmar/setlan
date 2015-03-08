@@ -452,7 +452,7 @@ def p_exp_set_unary(symbol):
     elif operator == 'SETMIN':
         symbol[0] = Setmin((start, end), symbol[2])
     elif operator == 'SETLEN':
-        symbol[0] = Setlen((start, end), symbol[2])
+        symbol[0] = SetLen((start, end), symbol[2])
     else:
         symbol[0] = Unary((start, end), operator, symbol[2])
 

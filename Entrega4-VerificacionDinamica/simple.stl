@@ -2,19 +2,28 @@ program {
   using
     int  a, b; # inicializan en 0
     set  c, d; # inicializan en {}
-    set  z;
+    set  z,x,y;
     bool e, f; # inicializan en false
   in
 
   a = -4;
   b = 4;
 
-  if (a /= not b){
+  if (a /= b){
     println "hola";
   }
   else if (a <= b){
     println ":(";
   };
+
+  x = {1,2,3};
+  z = {};
+  y = z \ x ++ z;
+  println z;
+  println x;
+  println y;
+  println $? z;
+
  
   
 
