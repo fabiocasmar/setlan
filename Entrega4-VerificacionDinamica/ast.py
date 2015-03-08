@@ -1347,6 +1347,8 @@ class Setmax(Unary):
             for i in valor:
                 x = max(i.evaluate(),x)
             return x
+        else:
+            error_empty_set(self.lexspan, self.operator)
 
 class Setmin(Unary):
     """Unary expressions with a '<?'"""
@@ -1366,6 +1368,17 @@ class Setmin(Unary):
             for i in valor:
                 x = min(i.evaluate(),x)
             return x
+        else:
+            error_empty_set(self.lexspan, self.operator)
+
+def error_empty_set(lexspan, operator):
+    message = "ERROR: empty set not permitted for '%s' operation, "
+    message += "from line %d, column %d to line %d, column %d"
+    s_lin, s_col = lexspan[0]
+    e_lin, e_col = lexspan[1]
+    data = str(operator), s_lin, s_col, e_lin, e_col
+    print '\n\n', message % data
+    exit()
 
 class SetLen(Unary):
     """Unary expressions with a '$?'"""
