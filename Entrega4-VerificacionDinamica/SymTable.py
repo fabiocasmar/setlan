@@ -64,7 +64,6 @@ class SymTable(object):
         if self.is_member(key):
             if key in self.scope:
                 symbol = self.scope[key]
-
                 if data_type == symbol.data_type:
                     symbol.value = value
                     self.scope[key] = symbol

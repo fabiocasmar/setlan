@@ -1,7 +1,10 @@
 program {
     using set a; set b; bool c; in
-    b = {1,2,3,4};
-    a = {1,2,5};
-    a = a ++ b;
-    a = a >< b;
+    b = {1,2,3,4,1,5};
+    a = {0,1,2,3,4};
+    print a == b;
+    a = 1 <+> a;
+    print a ==b;
+#    a = a ++ b;
+#    a = a >< b;
 }

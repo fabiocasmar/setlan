@@ -624,6 +624,7 @@ class Set(Expression):
                     error_unsuported_set(self.lexspan,i.check())
             return "SET"
 
+
     def evaluate(self):
         return self.values
 
@@ -866,15 +867,14 @@ class Setplus(Binary):
         left = self.left.check()
         right = self.right.check()
         type_tuples = [('INT', 'SET')]
-        check_bin(self.lexspan, self.operator, left, right, type_tuples)
+        return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
     def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
         for i in range(0,len(right)):
-            right[i] += left
-        return right
-
-
-
+            right[i].value += left
+        return copy.copy(right)
 
 class Setminus(Binary):
     """Binary expressions with a '<->'"""
@@ -890,9 +890,11 @@ class Setminus(Binary):
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
     def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
         for i in range(0,len(right)):
-            right[i] -= left
-        return right
+            right[i].value -= left
+        return copy.copy(right)
 
 class Settimes(Binary):
     """Binary expressions with a '<*>'"""
@@ -908,9 +910,11 @@ class Settimes(Binary):
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
     def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
         for i in range(0,len(right)):
-            right[i] *= left
-        return right
+            right[i].value *= left
+        return copy.copy(right)
 
 class Setmod(Binary):
     """Binary expressions with a '<%>'"""
@@ -926,9 +930,11 @@ class Setmod(Binary):
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
     def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
         for i in range(0,len(right)):
-            right[i] %= left
-        return right
+            right[i].value %= left
+        return copy.copy(right)
 
 class Setdivition(Binary):
     """Binary expressions with a '</>'"""
@@ -944,13 +950,13 @@ class Setdivition(Binary):
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
     def evaluate(self):
-
+        left = self.left.evaluate()
+        right = self.right.evaluate()
         if left == 0:
             error_division_by_zero(self.lexspan, self.operator)
-
         for i in range(0,len(right)):
             right[i] /= left
-        return right
+        return copy.copy(right)
 
 ######        Cojunto sobre Conjunto       ######
 
@@ -1193,7 +1199,23 @@ class Equal(Binary):
     def evaluate(self):
         left = self.left.evaluate()
         right = self.right.evaluate()
-        return left == right
+        if (self.left.check() == self.right.check() == "SET"):
+            right_temp = []
+            left_temp = []
+            for i in right:
+                right_temp.append(i.evaluate())
+            for i in left:
+                left_temp.append(i.evaluate())
+            for i in left:
+                if i.evaluate() not in right_temp:
+                    return False
+            for i in right:
+                if i.evaluate() not in left_temp:
+                    return False
+            return True
+        else:
+            return left == right
+
 
 class Unequal(Binary):
     """Binary expressions with a '/='"""
@@ -1234,7 +1256,7 @@ class Setbelong(Binary):
         left = self.left.evaluate()
         t_set = self.right.evaluate()
         for i in t_set:
-            if i == left: return True
+            if i.evaluate() == left: return True
         return False
 ###############################################################################
 
