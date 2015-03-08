@@ -1344,7 +1344,6 @@ class Setmax(Unary):
         valor = self.operand.evaluate()
         if len(valor)>0:
             x = valor[0].evaluate()
-           # if self.check() == 'INT':
             for i in valor:
                 x = max(i.evaluate(),x)
             return x
@@ -1364,7 +1363,6 @@ class Setmin(Unary):
         valor = self.operand.evaluate()
         if len(valor)>0:
             x = valor[0].evaluate()
-           # if self.check() == 'INT':
             for i in valor:
                 x = min(i.evaluate(),x)
             return x
