@@ -213,7 +213,8 @@ class Scan(Statement):
 
         self.scope.update(self.variable, symbol.data_type, value)
 
-
+def getKey(item):
+    return item.evaluate()
 
 
 class Print(Statement):
@@ -251,8 +252,7 @@ class Print(Statement):
             if isinstance(intrp, bool):
                 stdout.write(str(intrp).lower())
             elif isinstance(intrp, list):
-                print isinstance(intrp[1],int)
-                intrp.sort()
+                intrp.sort(key = getKey)
                 out = "{"
                 for i in range(0,len(intrp)):
                     out += str(intrp[i])
@@ -1055,7 +1055,7 @@ class Setdifference(Binary):
                 for j in der:
                     nuevo_der.append(j.evaluate())
                 i = 0  
-                while i < len(der):
+                while i < len(izq):
                     if izq[i].evaluate() not in nuevo_der:
                         nuevo_retorno.append(copy.copy(izq[i]))
                     i = i+1  
