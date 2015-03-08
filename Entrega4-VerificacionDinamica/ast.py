@@ -370,7 +370,7 @@ class For(Statement):
         return boolean
 
     def execute(self):
-        t_set = self.in_set.evaluate()
+        t_set = copy.deepcopy(self.in_set.evaluate())
         if self.dire == 'max' : t_set.sort(key = getKey,reverse = True)
         else: t_set.sort( key = getKey)
         for val in t_set:
