@@ -10,6 +10,7 @@
 from SymTable import SymTable, indent
 from sys import exit, stdout
 import re
+import copy
 
 static_error = []
 
@@ -966,7 +967,25 @@ class Setintersection(Binary):
         type_tuples = [('SET', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
-    
+    def evaluate(self):
+        izq = self.left.evaluate()
+        der = self.right.evaluate()
+        if len(izq)>0:
+            if len(der)>0:
+                nuevo_izq = []
+                nuevo_retorno = []
+                for j in izq:
+                    nuevo_izq.append(j.evaluate())
+                i = 0  
+                while i < len(der):
+                    if der[i].evaluate() in nuevo_izq:
+                        nuevo_retorno.append(copy.copy(der[i]))
+                    i = i+1  
+                return nuevo_retorno  
+            else:
+                return izq
+        else:
+            return der
         
 
 class Setunion(Binary):
@@ -983,6 +1002,29 @@ class Setunion(Binary):
         type_tuples = [('SET', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
 
+    def evaluate(self):
+        izq = self.left.evaluate()
+        der = self.right.evaluate()
+        if len(izq)>0:
+            if len(der)>0:
+                nuevo_izq = []
+                nuevo_retorno = []
+                for j in izq:
+                    nuevo_izq.append(j.evaluate())
+                i = 0  
+                for j in izq:
+                    nuevo_retorno.append(copy.copy(j))
+                while i < len(der):
+                    if der[i].evaluate() not in nuevo_izq:
+                        nuevo_retorno.append(copy.copy(der[i]))
+                    i = i+1  
+                return nuevo_retorno  
+            else:
+                return izq
+        else:
+            return der
+
+
 
 class Setdifference(Binary):
     """Binary expressions with a '/'"""
@@ -996,6 +1038,26 @@ class Setdifference(Binary):
         right = self.right.check()
         type_tuples = [('SET', 'SET')]
         return check_bin(self.lexspan, self.operator, left, right, type_tuples)
+
+    def evaluate(self):
+        izq = self.left.evaluate()
+        der = self.right.evaluate()
+        if len(izq)>0:
+            if len(der)>0:
+                nuevo_der = []
+                nuevo_retorno = []
+                for j in der:
+                    nuevo_der.append(j.evaluate())
+                i = 0  
+                while i < len(der):
+                    if izq[i].evaluate() not in nuevo_der:
+                        nuevo_retorno.append(copy.copy(izq[i]))
+                    i = i+1  
+                return nuevo_retorno  
+            else:
+                return izq
+        else:
+            return izq
 
 
 ######        Operadores Booleanos        ######
@@ -1256,6 +1318,14 @@ class Setmax(Unary):
         types = [('SET','INT')]
         return check_unary(self.lexspan, self.operator, operand, types)
 
+    def evaluate(self):
+        valor = self.operand.evaluate()
+        if len(valor)>0:
+            x = valor[0].evaluate()
+           # if self.check() == 'INT':
+            for i in valor:
+                x = max(i.evaluate(),x)
+            return x
 
 class Setmin(Unary):
     """Unary expressions with a '<?'"""
@@ -1267,6 +1337,15 @@ class Setmin(Unary):
         operand = self.operand.check()
         types = [('SET','INT')]
         return check_unary(self.lexspan, self.operator, operand, types)
+
+    def evaluate(self):
+        valor = self.operand.evaluate()
+        if len(valor)>0:
+            x = valor[0].evaluate()
+           # if self.check() == 'INT':
+            for i in valor:
+                x = min(i.evaluate(),x)
+            return x
 
 class SetLen(Unary):
     """Unary expressions with a '$?'"""
