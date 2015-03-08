@@ -371,10 +371,10 @@ class For(Statement):
 
     def execute(self):
         t_set = self.in_set.evaluate()
-        if self.dire == 'MAX' : sorted(t_set)
-        else: sorted(t_set,reverse = True)
+        if self.dire == 'max' : t_set.sort(key = getKey,reverse = True)
+        else: t_set.sort( key = getKey)
         for val in t_set:
-            self.statement.sym_table.update(self.variable, 'INT', val)
+            self.statement.scope.update(self.variable, 'INT', val)
             self.statement.execute()
 
 
@@ -932,6 +932,8 @@ class Setmod(Binary):
     def evaluate(self):
         left = self.left.evaluate()
         right = self.right.evaluate()
+        if left == 0:
+            error_division_by_zero(self.lexspan, self.operator)
         for i in range(0,len(right)):
             right[i].value %= left
         return copy.copy(right)
@@ -955,7 +957,7 @@ class Setdivition(Binary):
         if left == 0:
             error_division_by_zero(self.lexspan, self.operator)
         for i in range(0,len(right)):
-            right[i] /= left
+            right[i].value /= left
         return copy.copy(right)
 
 ######        Cojunto sobre Conjunto       ######
