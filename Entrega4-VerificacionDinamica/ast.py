@@ -109,7 +109,7 @@ class Assign(Statement):
 
 class Block(Statement):
     """Declaracion de bloque"""
-    def __init__(self, lexspan, statements, scope=SymTable()):
+    def __init__(self, lexspan, statements, scope):
         self.lexspan = lexspan
         self.statements = statements
         self.scope = scope
@@ -285,7 +285,7 @@ class If(Statement):
         self.condition = condition
         self.then_st = then_st
         self.else_st = else_st
-        self.sym_table = None
+        self.scope = None
 
     def print_tree(self, level):
         string = indent(level) + "IF\n"

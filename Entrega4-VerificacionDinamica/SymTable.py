@@ -26,12 +26,11 @@ class SymTable(object):
         return self.tree_string(0)
 
     def __nonzero__(self):
-        if self.outer:
-            return True
         if self.scope:
             return True
-        else:
-            return False
+        if self.outer:
+            return True
+        return False
 
     def print_tree(self, level):
         string = ""

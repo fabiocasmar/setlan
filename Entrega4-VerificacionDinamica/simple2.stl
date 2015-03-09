@@ -1,0 +1,14 @@
+program {
+  using
+    int x;
+    int y;
+  in
+  scan x;
+  if (x<y){
+    print "less";
+  } else {
+      if (x>y){
+      print "great";
+  };
+};
+}

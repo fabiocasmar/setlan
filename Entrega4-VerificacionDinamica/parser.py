@@ -62,7 +62,7 @@ def p_statement_block(symbol):
     if len(symbol) == 4:
         start, _ = span(symbol, 1)
         _, end = span(symbol, 3)
-        symbol[0] = Block((start, end), symbol[2])
+        symbol[0] = Block((start, end), symbol[2],SymTable())
     else:
         start, _ = span(symbol, 1)
         _, end = span(symbol, 6)
