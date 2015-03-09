@@ -254,9 +254,14 @@ class Print(Statement):
             elif isinstance(intrp, list):
                 intrp.sort(key = getKey)
                 out = "{"
+                list_temp = []
                 for i in range(0,len(intrp)):
-                    out += str(intrp[i])
-                    if i != len(intrp)-1: out += ","
+                    if intrp[i].evaluate() not in list_temp:
+                        list_temp.append(intrp[i].evaluate())
+                        out += str(intrp[i])
+                        if i != len(intrp)-1: out += ","
+                if out[len(out)-1]==",":
+                    out = out[:-1]
                 out += "}"
                 stdout.write(str(out))
             else:
@@ -332,14 +337,12 @@ class If(Statement):
 
 class For(Statement):
     """Declaracion for, funciona sobre conjuntos"""
-    def __init__(self, lexspan, variable, in_set, statement, dire,scope=SymTable()):
+    def __init__(self, lexspan, variable, in_set, statement, dire):
         self.lexspan = lexspan
         self.variable = variable
         self.in_set = in_set
         self.statement = statement
         self.dire = dire
-        self.scope = scope
-        self.sym_table = None
 
     def print_tree(self, level):
         string = indent(level) + "FOR\n"
@@ -355,8 +358,11 @@ class For(Statement):
 
     def check(self):
         boolean = True
+        for_sym_table = SymTable()
+        for_sym_table.outer = self.scope
+        for_sym_table.insert(self.variable, 'INT')
         set_scope(self.in_set, self.scope)
-        self.scope.insert(self.variable, 'INT')
+        set_scope(self.statement, for_sym_table)
         if(self.in_set.check() != "SET"):
             message = "ERROR: unsupported type '%s' for For "
             message += "from line %d, column %d"
@@ -364,18 +370,25 @@ class For(Statement):
             data = str(self.variable), s_lin, s_col
             static_error.append(message % data)
             boolean = False
-        set_scope(self.statement, self.scope)
         if self.statement.check() is False:
             boolean = False
         return boolean
 
     def execute(self):
-        t_set = copy.deepcopy(self.in_set.evaluate())
+        t_set_2 = copy.deepcopy(self.in_set.evaluate())
+        t_set = []
+        t_temp = []
+        for i in t_set_2:
+            if i.evaluate() not in t_temp:
+                t_set.append(i)
+                t_temp.append(i.evaluate()) 
         if self.dire == 'max' : t_set.sort(key = getKey,reverse = True)
         else: t_set.sort( key = getKey)
         for val in t_set:
             self.statement.scope.update(self.variable, 'INT', val)
+            self.statement.scope.find(self.variable).set_protected(True)
             self.statement.execute()
+            self.statement.scope.find(self.variable).set_protected(False)
 
 
 class While(Statement):

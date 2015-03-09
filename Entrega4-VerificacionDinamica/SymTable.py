@@ -65,9 +65,12 @@ class SymTable(object):
             if key in self.scope:
                 symbol = self.scope[key]
                 if data_type == symbol.data_type:
-                    symbol.value = value
-                    self.scope[key] = symbol
-                    return True
+                    if not symbol.protected:
+                        symbol.value = value
+                        self.scope[key] = symbol
+                        return True
+                    else:
+                        return False
                 else:
                     print "SymTable.update: Different data types"
                     return False
@@ -113,6 +116,11 @@ class Symbol(object):
             self.value=[]
         if(data_type == "BOOL"):
             self.value = False
+        self.protected = False
+    
+    def set_protected(self,protected):
+        self.protected = protected
+
 
     def print_tree(self):
             return str(self.data_type).lower() + " " + self.name         
