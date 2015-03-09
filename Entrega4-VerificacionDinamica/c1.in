@@ -1,0 +1,13 @@
+program {
+    using
+        set s;
+    in
+    s = {2, 3, 1};
+    for i min s do {
+        print s;
+        s = s >< {i}; # unión de conjuntos
+	print s;
+    };
+
+#    print s;
+}

@@ -255,11 +255,11 @@ class Print(Statement):
                 intrp.sort(key = getKey)
                 out = "{"
                 list_temp = []
-                for i in intrp:
-                    if i.evaluate() not in list_temp:
-                        list_temp.append(i.evaluate())
-                        out += str(i.evaluate())
-                        out += ","
+                for i in range(0,len(intrp)):
+                    if intrp[i].evaluate() not in list_temp:
+                        list_temp.append(intrp[i].evaluate())
+                        out += str(intrp[i])
+                        if i != len(intrp)-1: out += ","
                 if out[len(out)-1]==",":
                     out = out[:-1]
                 out += "}"
@@ -360,7 +360,7 @@ class For(Statement):
         boolean = True
         for_sym_table = SymTable()
         for_sym_table.outer = self.scope
-        self.scope.insert(self.variable, 'INT')
+        for_sym_table.insert(self.variable, 'INT')
         set_scope(self.in_set, self.scope)
         set_scope(self.statement, for_sym_table)
         if(self.in_set.check() != "SET"):
@@ -384,12 +384,11 @@ class For(Statement):
                 t_temp.append(i.evaluate()) 
         if self.dire == 'max' : t_set.sort(key = getKey,reverse = True)
         else: t_set.sort( key = getKey)
-        for val in t_set: 
-            self.statement.scope.find(self.variable).set_protected(False)
-            self.scope.update(self.variable, 'INT', val.evaluate())
-            self.scope.find(self.variable).set_protected(True)
+        for val in t_set:
+            self.statement.scope.update(self.variable, 'INT', val.evaluate())
+            self.statement.scope.find(self.variable).set_protected(True)
             self.statement.execute()
-            self.scope.find(self.variable).set_protected(False)
+            self.statement.scope.find(self.variable).set_protected(False)
 
 
 class While(Statement):
@@ -559,6 +558,7 @@ class Variable(Expression):
         #     data = self.name, line, column
         #     print message % data
         #     exit()
+
         return symbol.value
 
 
@@ -639,10 +639,8 @@ class Set(Expression):
 
 
     def evaluate(self):
-        i = 0
-       # while i < len(self.values):        
-        #    self.values[i] = Int((0,0),self.values[i].evaluate())
-         #   i=i+1
+        for i in range(0,len(self.values)):
+            self.values[i] = Int((0,0),self.values[i].evaluate())
         return self.values
 
 def error_unsuported_set(lexspan, type):
@@ -765,6 +763,7 @@ class Plus(Binary):
     def evaluate(self):
         left = self.left.evaluate()
         right = self.right.evaluate()
+
         if self.check() == 'INT':
             value = left + right
             if not (-2147483648 <= value <= 2147483648):
@@ -890,7 +889,7 @@ class Setplus(Binary):
         right = self.right.evaluate()
         for i in range(0,len(right)):
             right[i].value += left
-        return copy.deepcopy(right)
+        return copy.copy(right)
 
 class Setminus(Binary):
     """Binary expressions with a '<->'"""
@@ -910,7 +909,7 @@ class Setminus(Binary):
         right = self.right.evaluate()
         for i in range(0,len(right)):
             right[i].value -= left
-        return copy.deepcopy(right)
+        return copy.copy(right)
 
 class Settimes(Binary):
     """Binary expressions with a '<*>'"""
@@ -930,7 +929,7 @@ class Settimes(Binary):
         right = self.right.evaluate()
         for i in range(0,len(right)):
             right[i].value *= left
-        return copy.deepcopy(right)
+        return copy.copy(right)
 
 class Setmod(Binary):
     """Binary expressions with a '<%>'"""
@@ -952,7 +951,7 @@ class Setmod(Binary):
             error_division_by_zero(self.lexspan, self.operator)
         for i in range(0,len(right)):
             right[i].value %= left
-        return copy.deepcopy(right)
+        return copy.copy(right)
 
 class Setdivition(Binary):
     """Binary expressions with a '</>'"""
@@ -974,7 +973,7 @@ class Setdivition(Binary):
             error_division_by_zero(self.lexspan, self.operator)
         for i in range(0,len(right)):
             right[i].value /= left
-        return copy.deepcopy(right)
+        return copy.copy(right)
 
 ######        Cojunto sobre Conjunto       ######
 
@@ -1003,13 +1002,13 @@ class Setintersection(Binary):
                 i = 0  
                 while i < len(der):
                     if der[i].evaluate() in nuevo_izq:
-                        nuevo_retorno.append(Int(der[i].lexspan,der[i].evaluate()))
+                        nuevo_retorno.append(copy.copy(der[i]))
                     i = i+1  
                 return nuevo_retorno  
             else:
-                return der
+                return izq
         else:
-            return izq
+            return der
         
 
 class Setunion(Binary):
@@ -1037,10 +1036,10 @@ class Setunion(Binary):
                     nuevo_izq.append(j.evaluate())
                 i = 0  
                 for j in izq:
-                    nuevo_retorno.append(Int(j.lexspan,j.evaluate()))
+                    nuevo_retorno.append(copy.copy(j))
                 while i < len(der):
                     if der[i].evaluate() not in nuevo_izq:
-                        nuevo_retorno.append(Int(der[i].lexspan,der[i].evaluate()))
+                        nuevo_retorno.append(copy.copy(der[i]))
                     i = i+1
                 return nuevo_retorno  
             else:
@@ -1051,9 +1050,9 @@ class Setunion(Binary):
 
 
 class Setdifference(Binary):
-    """Binary expressions with a '\'"""
+    """Binary expressions with a '/'"""
     def __init__(self, lexspan, left, right):
-        Binary.__init__(self, lexspan, "\\", left, right)
+        Binary.__init__(self, lexspan, "/", left, right)
 
     def check(self):
         set_scope(self.left, self.scope)
@@ -1075,7 +1074,7 @@ class Setdifference(Binary):
                 i = 0  
                 while i < len(izq):
                     if izq[i].evaluate() not in nuevo_der:
-                        nuevo_retorno.append(Int(izq[i].lexspan,izq[i].evaluate()))
+                        nuevo_retorno.append(copy.copy(izq[i]))
                     i = i+1  
                 return nuevo_retorno  
             else:
